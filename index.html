@@ -416,6 +416,88 @@
   }
   .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
   .dialog-actions button.close-btn{background:#eee;color:var(--ink);}
+
+  /* ===================== APP-LIKE MOBILE LAYOUT ===================== */
+  .tabbar{display:none;}
+  .app-page{scroll-snap-align:none;}
+
+  @media (max-width:700px){
+    html,body{height:100%;}
+    body{
+      overflow:hidden;
+      height:100dvh;
+      height:100vh;
+      padding-bottom:0;
+    }
+    #appContent{
+      display:flex;
+      flex-direction:column;
+      height:100dvh;
+      height:100vh;
+    }
+    header.top{
+      flex:0 0 auto;
+      margin-bottom:0;
+      padding:14px 16px 12px;
+      border-bottom:1px solid var(--card-border);
+    }
+    .pages-scroller{
+      flex:1 1 auto;
+      min-height:0;
+      display:flex;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .pages-scroller::-webkit-scrollbar{display:none;}
+    .app-page{
+      flex:0 0 100%;
+      max-width:100%;
+      width:100%;
+      height:100%;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-align:start;
+      scroll-snap-stop:always;
+    }
+    .app-page .wrap{
+      max-width:none;
+      padding:16px 16px 28px;
+    }
+    .app-page footer{
+      border-top:none;
+      margin-top:0;
+      padding-top:0;
+    }
+    .tabbar{
+      display:flex;
+      flex:0 0 auto;
+      border-top:1px solid var(--card-border);
+      background:#fff;
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+    .tab-btn{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      padding:8px 4px 7px;
+      background:none;
+      border:none;
+      color:var(--ink-soft);
+      font-size:0.66rem;
+      font-weight:600;
+      border-radius:0;
+    }
+    .tab-btn:active{transform:none;opacity:0.7;}
+    .tab-btn .icon{font-size:1.2rem;line-height:1;}
+    .tab-btn.active{color:var(--navy-dark);}
+    .tab-btn.active .icon{transform:scale(1.08);}
+  }
 </style>
 </head>
 <body>
@@ -434,60 +516,92 @@
 </div>
 
 <div id="appContent" style="display:none;">
-<div class="wrap">
 
   <header class="top">
     <h1>📖 Plan czytania Pisma Świętego</h1>
     <span class="sub" id="todayLabel"></span>
   </header>
 
-  <section class="dash">
-    <div class="dash-grid">
-      <div class="stat">
-        <span class="num" id="statDone">0</span>
-        <span class="lbl">Ukończone</span>
-      </div>
-      <div class="stat">
-        <span class="num" id="statRemaining">365</span>
-        <span class="lbl">Pozostało dni</span>
-      </div>
-      <div class="stat">
-        <span class="num" id="statPercent">0%</span>
-        <span class="lbl">Postęp</span>
-      </div>
-    </div>
-    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-    <div class="dash-foot">
-      <span id="paceTag" class="pace-tag pace-ontime">na czasie</span>
-      <span>Szacowany koniec: <span class="end-date" id="endDate">—</span></span>
-    </div>
-    <div class="settings-row">
-      <label for="startDateInput">Data rozpoczęcia planu:</label>
-      <input type="date" id="startDateInput">
-      <span id="nominalEndNote"></span>
-      <span id="syncStatus" class="sync-status sync-off"></span>
-    </div>
-  </section>
+  <div class="pages-scroller" id="pagesScroller">
 
-  <section class="current-card" id="currentCard">
-    <!-- filled by JS -->
-  </section>
+    <section class="app-page" id="page-today">
+      <div class="wrap">
+        <section class="current-card" id="currentCard">
+          <!-- filled by JS -->
+        </section>
+      </div>
+    </section>
 
-  <div class="util-bar">
-    <button id="expandAllBtn">Rozwiń wszystkie miesiące</button>
-    <button id="collapseAllBtn">Zwiń wszystkie miesiące</button>
+    <section class="app-page" id="page-progress">
+      <div class="wrap">
+        <section class="dash">
+          <div class="dash-grid">
+            <div class="stat">
+              <span class="num" id="statDone">0</span>
+              <span class="lbl">Ukończone</span>
+            </div>
+            <div class="stat">
+              <span class="num" id="statRemaining">365</span>
+              <span class="lbl">Pozostało dni</span>
+            </div>
+            <div class="stat">
+              <span class="num" id="statPercent">0%</span>
+              <span class="lbl">Postęp</span>
+            </div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="dash-foot">
+            <span id="paceTag" class="pace-tag pace-ontime">na czasie</span>
+            <span>Szacowany koniec: <span class="end-date" id="endDate">—</span></span>
+          </div>
+          <div class="settings-row">
+            <label for="startDateInput">Data rozpoczęcia planu:</label>
+            <input type="date" id="startDateInput">
+            <span id="nominalEndNote"></span>
+            <span id="syncStatus" class="sync-status sync-off"></span>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="app-page" id="page-plan">
+      <div class="wrap">
+        <div class="util-bar">
+          <button id="expandAllBtn">Rozwiń wszystkie miesiące</button>
+          <button id="collapseAllBtn">Zwiń wszystkie miesiące</button>
+        </div>
+        <div id="monthsWrap"></div>
+      </div>
+    </section>
+
+    <section class="app-page" id="page-more">
+      <div class="wrap">
+        <footer>
+          <div class="util-bar footer-util">
+            <button id="exportBtn">⭳ Eksportuj postęp</button>
+            <button id="importBtn">⭱ Importuj postęp</button>
+            <button id="resetBtn">↺ Reset planu</button>
+          </div>
+        </footer>
+      </div>
+    </section>
+
   </div>
 
-  <div id="monthsWrap"></div>
-
-  <footer>
-    <div class="util-bar footer-util">
-      <button id="exportBtn">⭳ Eksportuj postęp</button>
-      <button id="importBtn">⭱ Importuj postęp</button>
-      <button id="resetBtn">↺ Reset planu</button>
-    </div>
-  </footer>
-</div>
+  <nav class="tabbar" id="tabbar">
+    <button class="tab-btn active" data-target="page-today" type="button">
+      <span class="icon">🏠</span><span>Dziś</span>
+    </button>
+    <button class="tab-btn" data-target="page-progress" type="button">
+      <span class="icon">📊</span><span>Postęp</span>
+    </button>
+    <button class="tab-btn" data-target="page-plan" type="button">
+      <span class="icon">📅</span><span>Plan</span>
+    </button>
+    <button class="tab-btn" data-target="page-more" type="button">
+      <span class="icon">⚙️</span><span>Więcej</span>
+    </button>
+  </nav>
 
 <dialog id="importDialog">
   <div class="dialog-body">
@@ -1122,6 +1236,44 @@ document.getElementById('importConfirm').onclick = ()=>{
     alert('Nie udało się wczytać danych. Sprawdź, czy wklejony tekst to poprawny JSON wyeksportowany z tej aplikacji.');
   }
 };
+
+/* ================= APP TABS (mobile swipe navigation) ================= */
+(function initTabs(){
+  const scroller = document.getElementById('pagesScroller');
+  const tabbar = document.getElementById('tabbar');
+  if(!scroller || !tabbar) return;
+  const buttons = Array.from(tabbar.querySelectorAll('.tab-btn'));
+  const pages = Array.from(scroller.querySelectorAll('.app-page'));
+
+  function setActive(idx){
+    buttons.forEach((b,i)=> b.classList.toggle('active', i===idx));
+  }
+
+  buttons.forEach((btn, idx)=>{
+    btn.addEventListener('click', ()=>{
+      const target = document.getElementById(btn.dataset.target);
+      if(!target) return;
+      scroller.scrollTo({ left: target.offsetLeft, behavior:'smooth' });
+      setActive(idx);
+    });
+  });
+
+  let scrollTimer = null;
+  scroller.addEventListener('scroll', ()=>{
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{
+      const w = scroller.clientWidth || 1;
+      const idx = Math.round(scroller.scrollLeft / w);
+      setActive(Math.max(0, Math.min(pages.length-1, idx)));
+    }, 60);
+  }, { passive:true });
+
+  window.addEventListener('resize', ()=>{
+    const active = buttons.findIndex(b=>b.classList.contains('active'));
+    const target = pages[active >= 0 ? active : 0];
+    if(target) scroller.scrollTo({ left: target.offsetLeft, behavior:'auto' });
+  });
+})();
 
 /* ================= INIT ================= */
 if(sessionStorage.getItem(PW_SESSION_KEY) === '1'){
