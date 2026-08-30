@@ -671,6 +671,7 @@ function renderCurrentCard(){
   const date = dateForDayNum(dayNum);
   const today = todayISO();
   const markedToday = state.lastMarkDate === today;
+  const skippedToday = state.lastSkipDate === today;
 
   card.innerHTML = `
     <div class="tag">Dzień ${day.d} · ${formatDatePL(date)}</div>
@@ -682,9 +683,10 @@ function renderCurrentCard(){
     <div class="btn-row">
       <button class="btn-primary" id="markDoneBtn" ${markedToday ? 'disabled' : ''}>✔ Przeczytane</button>
       <button class="btn-secondary" id="markExtraBtn" ${markedToday ? '' : 'disabled'}>➕ Czytam też kolejny dzień</button>
-      <button class="btn-skip" id="markSkipBtn">⏭ Dziś nie czytam</button>
+      <button class="btn-skip" id="markSkipBtn" ${skippedToday ? 'disabled' : ''}>⏭ Dziś nie czytam</button>
     </div>
     ${markedToday ? '<div class="marked-note">Dzisiejszy fragment został już oznaczony jako przeczytany. Wróć jutro, aby oznaczyć kolejny — albo skorzystaj z „Czytam też kolejny dzień”.</div>' : ''}
+    ${skippedToday ? '<div class="marked-note">Już przesunąłeś/aś dziś plan o jeden dzień. Kolejną zmianę będzie można wprowadzić jutro.</div>' : ''}
   `;
 
   document.getElementById('markDoneBtn').onclick = () => {
@@ -698,7 +700,9 @@ function renderCurrentCard(){
     setStatus(dayNum, 'done');
   };
   document.getElementById('markSkipBtn').onclick = () => {
+    if(skippedToday) return;
     if(!confirm('Czy na pewno dziś nie czytasz? Cały plan przesunie się o jeden dzień, a dzisiejszy fragment stanie się jutrzejszym.')) return;
+    state.lastSkipDate = today;
     const newStart = addDays(parseISO(state.startDate), 1);
     state.startDate = toISODate(newStart);
     saveState(state);
