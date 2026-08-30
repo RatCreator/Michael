@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.ratcreator.twa",
+        "sha256_cert_fingerprints": ["85:55:4F:2A:33:FE:E3:6A:2D:59:05:A8:5A:FF:27:6C:77:79:1A:E5:14:6C:44:F9:8D:F0:51:5A:E0:AE:5D:F0"]
+      }
+    }]
