@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "io.github.ratcreator.twa",
-        "sha256_cert_fingerprints": ["85:55:4F:2A:33:FE:E3:6A:2D:59:05:A8:5A:FF:27:6C:77:79:1A:E5:14:6C:44:F9:8D:F0:51:5A:E0:AE:5D:F0"]
+        "sha256_cert_fingerprints": ["59:35:C9:35:78:02:A6:D5:4A:52:C4:E8:8A:52:7C:28:CD:07:44:64:D9:06:96:21:1C:FD:81:0C:9B:26:3C:B9"]
       }
     }]
