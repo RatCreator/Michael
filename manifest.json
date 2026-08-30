@@ -1,0 +1,24 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Plan biblijny",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Plan biblijny",
+  "start_url": "https://ratcreator.github.io/Michael/",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "data:,",
+      "isSquare": false,
+      "isPng": false,
+      "isWebp": false,
+      "isJpg": false,
+      "width": 0,
+      "is512x512": false,
+      "is256x256": false,
+      "is192x192": false
+    }
+  ]
+}
