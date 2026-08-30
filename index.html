@@ -211,20 +211,6 @@
   .btn-primary{background:var(--gold);color:#2a1f0a;}
   .btn-secondary{background:rgba(255,255,255,0.14);color:#fff;}
   .btn-skip{background:transparent;color:#c9d4de;border:1px solid rgba(255,255,255,0.3);}
-  .app-link-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:4px 14px;
-    margin-top:10px;
-  }
-  .app-link-row a{
-    font-size:0.74rem;
-    color:var(--gold-soft);
-    text-decoration:underline;
-  }
-  @media (min-width:561px){
-    .app-link-row{display:none;}
-  }
   .all-done-msg{
     font-family:'Source Serif 4',serif;
     font-size:1.15rem;
@@ -970,28 +956,25 @@ function renderCurrentCard(){
       <div class="reading-line"><span class="k">NT</span><span>${day.nt}</span></div>
     </div>
     <div class="btn-row">
-      <button class="btn-primary" id="readNowBtn">📖 Czytaj teraz</button>
+      <button class="btn-primary" id="readOtBtn" ${day.ot === '-' ? 'disabled' : ''}>📖 Czytaj ST</button>
+      <button class="btn-primary" id="readNtBtn" ${day.nt === '-' ? 'disabled' : ''}>📖 Czytaj NT</button>
       <button class="btn-primary" id="markDoneBtn" ${markedToday ? 'disabled' : ''}>✔ Przeczytane</button>
       <button class="btn-secondary" id="markExtraBtn" ${markedToday ? '' : 'disabled'}>➕ Czytam też kolejny dzień</button>
       <button class="btn-skip" id="markSkipBtn" ${skippedToday ? 'disabled' : ''}>⏭ Dziś nie czytam</button>
-    </div>
-    <div class="app-link-row">
-      <a href="https://play.google.com/store/apps/details?id=pl.pismoswiete.standard" target="_blank" rel="noopener">📱 Pobierz aplikację (Android)</a>
-      <a href="https://apps.apple.com/pl/search?term=pismo%20%C5%9Bwi%C4%99te%20paulist%C3%B3w" target="_blank" rel="noopener">📱 Pobierz aplikację (iOS)</a>
     </div>
     ${markedToday ? '<div class="marked-note">Dzisiejszy fragment został już oznaczony jako przeczytany. Wróć jutro, aby oznaczyć kolejny — albo skorzystaj z „Czytam też kolejny dzień”.</div>' : ''}
     ${skippedToday ? '<div class="marked-note">Już przesunąłeś/aś dziś plan o jeden dzień. Kolejną zmianę będzie można wprowadzić jutro.</div>' : ''}
   `;
 
-  document.getElementById('readNowBtn').onclick = () => {
-    const otUrl = pismoswieteUrl(day.ot);
-    const ntUrl = pismoswieteUrl(day.nt);
-    if(!otUrl && !ntUrl){
-      alert('Nie udało się rozpoznać fragmentu do otwarcia dla tego dnia.');
-      return;
-    }
-    if(otUrl) window.open(otUrl, '_blank');
-    if(ntUrl) window.open(ntUrl, '_blank');
+  document.getElementById('readOtBtn').onclick = () => {
+    const url = pismoswieteUrl(day.ot);
+    if(!url){ alert('Nie udało się rozpoznać fragmentu ST do otwarcia dla tego dnia.'); return; }
+    window.open(url, '_blank');
+  };
+  document.getElementById('readNtBtn').onclick = () => {
+    const url = pismoswieteUrl(day.nt);
+    if(!url){ alert('Nie udało się rozpoznać fragmentu NT do otwarcia dla tego dnia.'); return; }
+    window.open(url, '_blank');
   };
 
   document.getElementById('markDoneBtn').onclick = () => {
