@@ -38,13 +38,17 @@
   }
   .wrap{max-width:820px;margin:0 auto;padding:20px 16px 8px;}
   header.top{
+    border-bottom:2px solid var(--navy);
+    margin-bottom:20px;
+  }
+  .header-inner{
+    max-width:820px;
+    margin:0 auto;
+    padding:20px 16px 14px;
     display:flex;
     align-items:baseline;
     justify-content:space-between;
     gap:12px;
-    border-bottom:2px solid var(--navy);
-    padding-bottom:14px;
-    margin-bottom:20px;
   }
   header.top h1{
     font-family:'Source Serif 4',serif;
@@ -59,6 +63,70 @@
     color:var(--ink-soft);
     white-space:nowrap;
   }
+  .site-nav{display:none;}
+  .page-heading{display:none;}
+
+  /* ============= "Czytaj ST / Czytaj NT" buttons below the reading card ============= */
+  .read-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .read-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#fff;
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+    text-align:left;
+    font-family:'Inter',sans-serif;
+    transition:transform .1s ease, border-color .15s ease, box-shadow .15s ease;
+    box-shadow:0 1px 2px rgba(20,30,45,0.05);
+  }
+  .read-btn:active{transform:scale(0.97);}
+  .read-btn:hover{border-color:var(--gold);box-shadow:0 3px 10px rgba(184,134,43,0.16);}
+  .read-btn-icon{
+    flex:none;
+    font-size:1.25rem;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    background:var(--gold-soft);
+  }
+  .read-nt .read-btn-icon{background:var(--green-soft);}
+  .read-btn-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    min-width:0;
+    flex:1;
+  }
+  .read-btn-label{
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--navy-dark);
+  }
+  .read-btn-ref{
+    font-size:0.76rem;
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .read-btn-arrow{
+    flex:none;
+    font-size:1.3rem;
+    color:var(--gold);
+  }
+  .read-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .read-btn:disabled:hover{border-color:var(--card-border);box-shadow:0 1px 2px rgba(20,30,45,0.05);}
 
   /* dashboard */
   .dash{
@@ -438,8 +506,13 @@
     header.top{
       flex:0 0 auto;
       margin-bottom:0;
-      padding:14px 16px 12px;
       border-bottom:1px solid var(--card-border);
+    }
+    .header-inner{
+      padding:14px 16px 12px;
+    }
+    .read-buttons{
+      margin-top:-8px;
     }
     .pages-scroller{
       flex:1 1 auto;
@@ -498,6 +571,121 @@
     .tab-btn.active{color:var(--navy-dark);}
     .tab-btn.active .icon{transform:scale(1.08);}
   }
+
+  /* ===================== DESKTOP / LAPTOP WEBSITE LAYOUT ===================== */
+  @media (min-width:701px){
+    :root{ --page-x: 40px; --page-max: 1120px; }
+
+    body{ background:#eef1f4; }
+
+    header.top{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:rgba(255,255,255,0.92);
+      backdrop-filter:saturate(180%) blur(8px);
+      -webkit-backdrop-filter:saturate(180%) blur(8px);
+      border-bottom:1px solid var(--card-border);
+      margin-bottom:0;
+    }
+    .header-inner{
+      max-width:var(--page-max);
+      padding:14px var(--page-x);
+      align-items:center;
+    }
+    header.top h1{ font-size:1.2rem; }
+    header.top .sub{ display:none; }
+
+    .site-nav{
+      display:flex;
+      gap:2px;
+      background:var(--card);
+      padding:4px;
+      border-radius:12px;
+    }
+    .nav-link{
+      position:relative;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-family:'Inter',sans-serif;
+      font-weight:600;
+      font-size:0.86rem;
+      color:var(--ink-soft);
+      padding:8px 16px;
+      border-radius:9px;
+      transition:color .15s ease, background .15s ease;
+    }
+    .nav-link:hover{ color:var(--navy-dark); }
+    .nav-link.active{
+      color:#fff;
+      background:var(--navy-dark);
+    }
+
+    /* body content: only one "page" visible at a time, styled like a normal site page */
+    .pages-scroller{
+      display:block;
+    }
+    .app-page{
+      display:none;
+      height:auto;
+      overflow:visible;
+    }
+    .app-page.is-active{
+      display:block;
+    }
+    .app-page .wrap{
+      max-width:var(--page-max);
+      margin:0 auto;
+      padding:44px var(--page-x) 80px;
+    }
+
+    /* page heading shown above each section's content, like a normal website */
+    .page-heading{
+      display:block;
+      font-family:'Source Serif 4',serif;
+      font-weight:700;
+      font-size:1.7rem;
+      color:var(--navy-dark);
+      margin:0 0 22px;
+      letter-spacing:-0.01em;
+    }
+
+    /* nicer card polish for a "real website" feel */
+    .dash, .current-card, details.month, .util-bar button, footer{
+      box-shadow:0 1px 3px rgba(20,30,45,0.06);
+    }
+    .dash{ padding:26px 28px 22px; }
+    .current-card{ padding:28px 30px; }
+    .current-card h2{ font-size:1.5rem; }
+
+    .read-buttons{
+      grid-template-columns:1fr 1fr;
+      max-width:640px;
+      gap:14px;
+    }
+    .read-btn{ padding:18px 18px; border-radius:14px; }
+    .read-btn-icon{ width:44px; height:44px; font-size:1.4rem; }
+    .read-btn-label{ font-size:0.88rem; }
+    .read-btn-ref{ font-size:0.82rem; }
+
+    .dash-grid{
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      max-width:520px;
+    }
+
+    #monthsWrap{ max-width:820px; }
+
+    footer{
+      border-top:none;
+      background:#fff;
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:18px 20px;
+      margin-top:8px;
+    }
+    .footer-util{ justify-content:flex-start; }
+  }
 </style>
 </head>
 <body>
@@ -518,22 +706,37 @@
 <div id="appContent" style="display:none;">
 
   <header class="top">
-    <h1>📖 Plan czytania Pisma Świętego</h1>
-    <span class="sub" id="todayLabel"></span>
+    <div class="header-inner">
+      <div class="brand">
+        <h1>📖 Plan czytania Pisma Świętego</h1>
+        <span class="sub" id="todayLabel"></span>
+      </div>
+      <nav class="site-nav" id="siteNav">
+        <button class="nav-link active" data-target="page-today" type="button">Dziś</button>
+        <button class="nav-link" data-target="page-progress" type="button">Postęp</button>
+        <button class="nav-link" data-target="page-plan" type="button">Plan</button>
+        <button class="nav-link" data-target="page-more" type="button">Więcej</button>
+      </nav>
+    </div>
   </header>
 
   <div class="pages-scroller" id="pagesScroller">
 
     <section class="app-page" id="page-today">
       <div class="wrap">
+        <h2 class="page-heading">Dziś</h2>
         <section class="current-card" id="currentCard">
           <!-- filled by JS -->
         </section>
+        <div class="read-buttons" id="readButtons">
+          <!-- filled by JS -->
+        </div>
       </div>
     </section>
 
     <section class="app-page" id="page-progress">
       <div class="wrap">
+        <h2 class="page-heading">Twój postęp</h2>
         <section class="dash">
           <div class="dash-grid">
             <div class="stat">
@@ -566,6 +769,7 @@
 
     <section class="app-page" id="page-plan">
       <div class="wrap">
+        <h2 class="page-heading">Plan czytania</h2>
         <div class="util-bar">
           <button id="expandAllBtn">Rozwiń wszystkie miesiące</button>
           <button id="collapseAllBtn">Zwiń wszystkie miesiące</button>
@@ -576,6 +780,7 @@
 
     <section class="app-page" id="page-more">
       <div class="wrap">
+        <h2 class="page-heading">Więcej</h2>
         <footer>
           <div class="util-bar footer-util">
             <button id="exportBtn">⭳ Eksportuj postęp</button>
@@ -1051,9 +1256,11 @@ function renderDashboard(){
 /* ================= RENDER: CURRENT CARD ================= */
 function renderCurrentCard(){
   const card = document.getElementById('currentCard');
+  const readBtnsWrap = document.getElementById('readButtons');
   const dayNum = firstPendingDay();
   if(dayNum === null){
     card.innerHTML = `<div class="all-done-msg">Ukończyłeś/aś cały roczny plan czytania. 🎉<br>Chwała Bogu!</div>`;
+    if(readBtnsWrap) readBtnsWrap.innerHTML = '';
     return;
   }
   const day = PLAN[dayNum-1];
@@ -1070,8 +1277,6 @@ function renderCurrentCard(){
       <div class="reading-line"><span class="k">NT</span><span>${day.nt}</span></div>
     </div>
     <div class="btn-row">
-      <button class="btn-primary" id="readOtBtn" ${day.ot === '-' ? 'disabled' : ''}>📖 Czytaj ST</button>
-      <button class="btn-primary" id="readNtBtn" ${day.nt === '-' ? 'disabled' : ''}>📖 Czytaj NT</button>
       <button class="btn-primary" id="markDoneBtn" ${markedToday ? 'disabled' : ''}>✔ Przeczytane</button>
       <button class="btn-secondary" id="markExtraBtn" ${markedToday ? '' : 'disabled'}>➕ Czytam też kolejny dzień</button>
       <button class="btn-skip" id="markSkipBtn" ${skippedToday ? 'disabled' : ''}>⏭ Dziś nie czytam</button>
@@ -1080,12 +1285,35 @@ function renderCurrentCard(){
     ${skippedToday ? '<div class="marked-note">Już przesunąłeś/aś dziś plan o jeden dzień. Kolejną zmianę będzie można wprowadzić jutro.</div>' : ''}
   `;
 
-  document.getElementById('readOtBtn').onclick = () => {
+  if(readBtnsWrap){
+    readBtnsWrap.innerHTML = `
+      <button class="read-btn read-ot" id="readOtBtn" ${day.ot === '-' ? 'disabled' : ''}>
+        <span class="read-btn-icon">📜</span>
+        <span class="read-btn-text">
+          <span class="read-btn-label">Stary Testament</span>
+          <span class="read-btn-ref">${day.ot === '-' ? 'Brak fragmentu na dziś' : day.ot}</span>
+        </span>
+        <span class="read-btn-arrow">›</span>
+      </button>
+      <button class="read-btn read-nt" id="readNtBtn" ${day.nt === '-' ? 'disabled' : ''}>
+        <span class="read-btn-icon">✝️</span>
+        <span class="read-btn-text">
+          <span class="read-btn-label">Nowy Testament</span>
+          <span class="read-btn-ref">${day.nt === '-' ? 'Brak fragmentu na dziś' : day.nt}</span>
+        </span>
+        <span class="read-btn-arrow">›</span>
+      </button>
+    `;
+  }
+
+  const readOtBtn = document.getElementById('readOtBtn');
+  const readNtBtn = document.getElementById('readNtBtn');
+  if(readOtBtn) readOtBtn.onclick = () => {
     const url = pismoswieteUrl(day.ot);
     if(!url){ alert('Nie udało się rozpoznać fragmentu ST do otwarcia dla tego dnia.'); return; }
     window.open(url, '_blank');
   };
-  document.getElementById('readNtBtn').onclick = () => {
+  if(readNtBtn) readNtBtn.onclick = () => {
     const url = pismoswieteUrl(day.nt);
     if(!url){ alert('Nie udało się rozpoznać fragmentu NT do otwarcia dla tego dnia.'); return; }
     window.open(url, '_blank');
@@ -1237,42 +1465,75 @@ document.getElementById('importConfirm').onclick = ()=>{
   }
 };
 
-/* ================= APP TABS (mobile swipe navigation) ================= */
-(function initTabs(){
+/* ================= APP NAVIGATION =================
+   Mobile: horizontal swipe between full-screen pages (bottom tab bar).
+   Desktop: classic single-page website navigation (top nav bar, one
+   section shown at a time, page scrolls to top on switch). */
+(function initNavigation(){
   const scroller = document.getElementById('pagesScroller');
-  const tabbar = document.getElementById('tabbar');
-  if(!scroller || !tabbar) return;
-  const buttons = Array.from(tabbar.querySelectorAll('.tab-btn'));
+  if(!scroller) return;
   const pages = Array.from(scroller.querySelectorAll('.app-page'));
+  const navButtons = Array.from(document.querySelectorAll('[data-target].tab-btn, [data-target].nav-link'));
+  const desktopQuery = window.matchMedia('(min-width:701px)');
 
-  function setActive(idx){
-    buttons.forEach((b,i)=> b.classList.toggle('active', i===idx));
+  function isDesktop(){ return desktopQuery.matches; }
+
+  function setActiveButtons(id){
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === id));
   }
 
-  buttons.forEach((btn, idx)=>{
-    btn.addEventListener('click', ()=>{
-      const target = document.getElementById(btn.dataset.target);
-      if(!target) return;
-      scroller.scrollTo({ left: target.offsetLeft, behavior:'smooth' });
-      setActive(idx);
-    });
+  function showDesktopPage(id){
+    pages.forEach(p => p.classList.toggle('is-active', p.id === id));
+    setActiveButtons(id);
+  }
+
+  function goTo(id, {userInitiated} = {}){
+    if(isDesktop()){
+      showDesktopPage(id);
+      if(userInitiated) window.scrollTo({ top:0, behavior:'smooth' });
+    } else {
+      const target = document.getElementById(id);
+      if(target) scroller.scrollTo({ left: target.offsetLeft, behavior: userInitiated ? 'smooth' : 'auto' });
+      setActiveButtons(id);
+    }
+  }
+
+  navButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=> goTo(btn.dataset.target, { userInitiated:true }));
   });
 
+  // Mobile: keep tab bar in sync while the user swipes between pages.
   let scrollTimer = null;
   scroller.addEventListener('scroll', ()=>{
+    if(isDesktop()) return;
     if(scrollTimer) clearTimeout(scrollTimer);
     scrollTimer = setTimeout(()=>{
       const w = scroller.clientWidth || 1;
       const idx = Math.round(scroller.scrollLeft / w);
-      setActive(Math.max(0, Math.min(pages.length-1, idx)));
+      const page = pages[Math.max(0, Math.min(pages.length-1, idx))];
+      if(page) setActiveButtons(page.id);
     }, 60);
   }, { passive:true });
 
-  window.addEventListener('resize', ()=>{
-    const active = buttons.findIndex(b=>b.classList.contains('active'));
-    const target = pages[active >= 0 ? active : 0];
-    if(target) scroller.scrollTo({ left: target.offsetLeft, behavior:'auto' });
-  });
+  function currentActiveId(){
+    const active = navButtons.find(b=>b.classList.contains('active'));
+    return (active && active.dataset.target) || pages[0].id;
+  }
+
+  function applyModeLayout(){
+    const id = currentActiveId();
+    if(isDesktop()){
+      showDesktopPage(id);
+    } else {
+      pages.forEach(p => p.classList.remove('is-active'));
+      goTo(id, { userInitiated:false });
+    }
+  }
+
+  desktopQuery.addEventListener ? desktopQuery.addEventListener('change', applyModeLayout) : desktopQuery.addListener(applyModeLayout);
+  window.addEventListener('resize', applyModeLayout);
+
+  applyModeLayout();
 })();
 
 /* ================= INIT ================= */
