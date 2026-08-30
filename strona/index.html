@@ -3,9 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#152a3e">
 <title>Plan czytania Pisma Świętego</title>
-<link rel="icon" href="data:,">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plan Czytania">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1535,6 +1540,15 @@ document.getElementById('importConfirm').onclick = ()=>{
 
   applyModeLayout();
 })();
+
+/* ================= PWA: rejestracja service workera ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./service-worker.js').catch((err)=>{
+      console.warn('Nie udało się zarejestrować service workera.', err);
+    });
+  });
+}
 
 /* ================= INIT ================= */
 if(sessionStorage.getItem(PW_SESSION_KEY) === '1'){
