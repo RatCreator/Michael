@@ -490,6 +490,112 @@
   .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
   .dialog-actions button.close-btn{background:#eee;color:var(--ink);}
 
+  /* ===================== CZYTNIK: modal z tekstem rozdzia\u0142u (iframe pismoswiete.pl) ===================== */
+  #readerDialog{
+    max-width:900px;
+    width:96%;
+    height:88vh;
+    max-height:900px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  #readerDialog .reader-head{
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    background:var(--navy-dark);
+    color:#fff;
+  }
+  #readerDialog .reader-title{
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    font-size:1rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  #readerDialog .reader-head-actions{
+    flex:none;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  #readerDialog .reader-head-actions button,
+  #readerDialog .reader-head-actions a{
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:0.8rem;
+    font-family:inherit;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  #readerDialog .reader-head-actions button:hover,
+  #readerDialog .reader-head-actions a:hover{background:rgba(255,255,255,0.22);}
+  #readerDialog .reader-body{
+    flex:1;
+    position:relative;
+    background:#fff;
+    min-height:0;
+  }
+  #readerDialog iframe{
+    width:100%;
+    height:100%;
+    border:none;
+    display:block;
+  }
+  #readerDialog .reader-loading{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:10px;
+    color:var(--ink-soft);
+    font-size:0.85rem;
+    background:#fff;
+    transition:opacity .2s ease;
+  }
+  #readerDialog .reader-spinner{
+    width:26px;height:26px;
+    border-radius:50%;
+    border:3px solid var(--card-border);
+    border-top-color:var(--gold);
+    animation:reader-spin 0.8s linear infinite;
+  }
+  @keyframes reader-spin{to{transform:rotate(360deg);}}
+  #readerDialog .reader-fallback{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:14px;
+    padding:24px;
+    background:#fff;
+  }
+  #readerDialog .reader-fallback.show{display:flex;}
+  #readerDialog .reader-fallback p{color:var(--ink-soft);font-size:0.9rem;max-width:360px;margin:0;}
+  #readerDialog .reader-fallback a.btn-primary{
+    display:inline-block;
+    text-decoration:none;
+  }
+  @media (max-width:700px){
+    #readerDialog{width:100%;height:100%;max-height:none;border-radius:0;}
+  }
+
   /* ===================== APP-LIKE MOBILE LAYOUT ===================== */
   .tabbar{display:none;}
   .app-page{scroll-snap-align:none;}
@@ -822,6 +928,27 @@
       <button class="close-btn" id="importCancel">Anuluj</button>
       <button class="btn-primary" id="importConfirm" style="background:var(--navy-dark);color:#fff;">Importuj</button>
     </div>
+  </div>
+</dialog>
+
+<dialog id="readerDialog">
+  <div class="reader-head">
+    <span class="reader-title" id="readerTitle">Czytanie fragmentu</span>
+    <span class="reader-head-actions">
+      <a id="readerOpenTab" href="#" target="_blank" rel="noopener">⤢ Nowa karta</a>
+      <button id="readerCloseBtn" type="button">✕ Zamknij</button>
+    </span>
+  </div>
+  <div class="reader-body">
+    <div class="reader-loading" id="readerLoading">
+      <div class="reader-spinner"></div>
+      <span>Wczytuję tekst…</span>
+    </div>
+    <div class="reader-fallback" id="readerFallback">
+      <p>Nie udało się wczytać tekstu wewnątrz aplikacji (strona pismoswiete.pl może wymagać zalogowania lub blokować osadzanie). Otwórz fragment w nowej karcie.</p>
+      <a class="btn-primary" id="readerFallbackLink" href="#" target="_blank" rel="noopener" style="background:var(--navy-dark);color:#fff;padding:10px 18px;border-radius:10px;">Otwórz w nowej karcie</a>
+    </div>
+    <iframe id="readerFrame" title="Tekst Pisma Świętego" referrerpolicy="no-referrer"></iframe>
   </div>
 </dialog>
 </div>
@@ -1206,6 +1333,65 @@ function pismoswieteUrl(refStr){
   return `https://pismoswiete.pl/demo#/tome/${slug}/chapter/${ref.chapter}/0`;
 }
 
+/* ================= CZYTNIK: modal z tekstem rozdziału (bez opuszczania strony) =================
+   Zamiast otwierać pismoswiete.pl w nowej karcie, osadzamy tę stronę w <iframe>
+   wewnątrz modala na index(2).html. Uwaga: pismoswiete.pl może blokować osadzanie
+   (nagłówek X-Frame-Options / CSP) albo wymagać zalogowania do pełnej treści — w takim
+   wypadku po krótkim czasie pokazujemy zapasowy przycisk "Otwórz w nowej karcie". */
+const readerDialog = document.getElementById('readerDialog');
+const readerFrame = document.getElementById('readerFrame');
+const readerLoading = document.getElementById('readerLoading');
+const readerFallback = document.getElementById('readerFallback');
+const readerTitle = document.getElementById('readerTitle');
+const readerOpenTab = document.getElementById('readerOpenTab');
+const readerFallbackLink = document.getElementById('readerFallbackLink');
+let readerFallbackTimer = null;
+
+function openReader(refStr, label){
+  const url = pismoswieteUrl(refStr);
+  if(!url){ alert('Nie udało się rozpoznać tego fragmentu do wyświetlenia.'); return; }
+
+  readerTitle.textContent = label;
+  readerOpenTab.href = url;
+  readerFallbackLink.href = url;
+  readerFallback.classList.remove('show');
+  readerLoading.style.opacity = '1';
+  readerLoading.style.display = 'flex';
+  readerFrame.src = url;
+
+  if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
+  // Jeśli strona nie zdąży się załadować (np. blokuje osadzanie w ramce),
+  // po kilku sekundach pokazujemy zapasowy link zamiast pustego okna.
+  readerFallbackTimer = setTimeout(() => {
+    readerFallback.classList.add('show');
+    readerLoading.style.display = 'none';
+  }, 6000);
+
+  if(typeof readerDialog.showModal === 'function'){
+    readerDialog.showModal();
+  }
+}
+
+readerFrame.addEventListener('load', () => {
+  if(!readerFrame.src) return;
+  if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
+  readerLoading.style.display = 'none';
+});
+
+function closeReader(){
+  if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
+  readerFrame.src = 'about:blank';
+  readerDialog.close();
+}
+document.getElementById('readerCloseBtn').onclick = closeReader;
+readerDialog.addEventListener('cancel', closeReader);
+readerDialog.addEventListener('click', (e) => {
+  // Kliknięcie w tło (poza treścią modala) zamyka okno.
+  const rect = readerDialog.getBoundingClientRect();
+  const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+  if(!inside) closeReader();
+});
+
 /* ================= RENDER: DASHBOARD ================= */
 function renderDashboard(){
   const doneCount = Object.values(state.status).filter(s=>s==='done').length;
@@ -1313,16 +1499,8 @@ function renderCurrentCard(){
 
   const readOtBtn = document.getElementById('readOtBtn');
   const readNtBtn = document.getElementById('readNtBtn');
-  if(readOtBtn) readOtBtn.onclick = () => {
-    const url = pismoswieteUrl(day.ot);
-    if(!url){ alert('Nie udało się rozpoznać fragmentu ST do otwarcia dla tego dnia.'); return; }
-    window.open(url, '_blank');
-  };
-  if(readNtBtn) readNtBtn.onclick = () => {
-    const url = pismoswieteUrl(day.nt);
-    if(!url){ alert('Nie udało się rozpoznać fragmentu NT do otwarcia dla tego dnia.'); return; }
-    window.open(url, '_blank');
-  };
+  if(readOtBtn) readOtBtn.onclick = () => openReader(day.ot, `ST · ${day.ot}`);
+  if(readNtBtn) readNtBtn.onclick = () => openReader(day.nt, `NT · ${day.nt}`);
 
   document.getElementById('markDoneBtn').onclick = () => {
     if(markedToday) return;
