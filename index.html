@@ -30,6 +30,29 @@
     --rust:#a85b2e;
     --rust-soft:#f3e6dd;
     --radius:14px;
+    --surface:#ffffff;
+    --page-bg:#eef1f4;
+    --header-bg:rgba(255,255,255,0.92);
+    color-scheme:light;
+  }
+  html.theme-dark{
+    --bg:#10161d;
+    --card:#1b232c;
+    --card-border:#2c3540;
+    --ink:#e7ebf0;
+    --ink-soft:#93a1b0;
+    --navy:#4d7699;
+    --navy-dark:#0b1218;
+    --gold:#d9ac5c;
+    --gold-soft:#392f1c;
+    --green:#6fbb92;
+    --green-soft:#17281f;
+    --rust:#df9166;
+    --rust-soft:#332018;
+    --surface:#1b232c;
+    --page-bg:#0b1116;
+    --header-bg:rgba(16,22,29,0.92);
+    color-scheme:dark;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -82,7 +105,7 @@
     display:flex;
     align-items:center;
     gap:10px;
-    background:#fff;
+    background:var(--surface);
     border:1px solid var(--card-border);
     border-radius:12px;
     padding:14px;
@@ -219,9 +242,19 @@
     padding:4px 6px;
     border:1px solid var(--card-border);
     border-radius:8px;
-    background:#fff;
+    background:var(--surface);
     color:var(--ink);
   }
+  .settings-row select{
+    font-family:inherit;
+    font-size:0.85rem;
+    padding:6px 8px;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .settings-row label{color:var(--ink-soft);}
 
   /* current card */
   .current-card{
@@ -299,7 +332,7 @@
     margin-bottom:20px;
   }
   .util-bar button{
-    background:#fff;
+    background:var(--surface);
     color:var(--navy-dark);
     border:1px solid var(--card-border);
     font-size:0.78rem;
@@ -313,7 +346,7 @@
     border-radius:12px;
     margin-bottom:10px;
     overflow:hidden;
-    background:#fff;
+    background:var(--surface);
   }
   details.month[open]{border-color:var(--navy);}
   summary.month-head{
@@ -367,7 +400,7 @@
   .day-row.is-done .day-text{text-decoration:line-through;text-decoration-color:rgba(63,115,85,0.45);}
   .status-btn{
     justify-self:end;
-    background:#fff;
+    background:var(--surface);
     border:1px solid var(--card-border);
     color:var(--ink-soft);
     font-size:0.72rem;
@@ -440,7 +473,7 @@
     padding:20px;
   }
   .lock-box{
-    background:#fff;
+    background:var(--surface);
     border-radius:var(--radius);
     padding:32px 28px;
     max-width:360px;
@@ -474,6 +507,8 @@
     padding:0;
     max-width:420px;
     width:90%;
+    background:var(--surface);
+    color:var(--ink);
   }
   dialog::backdrop{background:rgba(20,30,40,0.5);}
   .dialog-body{padding:20px;}
@@ -486,16 +521,18 @@
     border:1px solid var(--card-border);
     border-radius:8px;
     padding:8px;
+    background:var(--surface);
+    color:var(--ink);
   }
   .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
-  .dialog-actions button.close-btn{background:#eee;color:var(--ink);}
+  .dialog-actions button.close-btn{background:var(--card);color:var(--ink);}
 
   /* ===================== CZYTNIK: rama z tekstem rozdziału, zawsze widoczna na stronie "Dziś" =====================
      Zamiast otwierać pismoswiete.pl w nowej karcie/oknie, osadzamy tę stronę w <iframe>
      na sztywno w tej ramce, poniżej przycisków ST/NT. Nigdy nie pojawia się jako
      osobne okno / modal / nowa karta (poza jawnym linkiem zapasowym). */
   .inline-reader{
-    background:#fff;
+    background:var(--surface);
     border:1px solid var(--card-border);
     border-radius:var(--radius);
     overflow:hidden;
@@ -544,7 +581,7 @@
     height:60vh;
     min-height:360px;
     max-height:640px;
-    background:#fff;
+    background:var(--surface);
   }
   .inline-reader iframe{width:100%;height:100%;border:none;display:block;}
   .inline-reader .reader-placeholder{
@@ -569,7 +606,7 @@
     gap:10px;
     color:var(--ink-soft);
     font-size:0.85rem;
-    background:#fff;
+    background:var(--surface);
   }
   .inline-reader .reader-spinner{
     width:26px;height:26px;
@@ -589,7 +626,7 @@
     text-align:center;
     gap:14px;
     padding:24px;
-    background:#fff;
+    background:var(--surface);
   }
   .inline-reader .reader-fallback.show{display:flex;}
   .inline-reader .reader-fallback p{color:var(--ink-soft);font-size:0.9rem;max-width:360px;margin:0;}
@@ -706,7 +743,7 @@
       display:flex;
       flex:0 0 auto;
       border-top:1px solid var(--card-border);
-      background:#fff;
+      background:var(--surface);
       padding-bottom:env(safe-area-inset-bottom);
     }
     .tab-btn{
@@ -734,13 +771,13 @@
   @media (min-width:701px){
     :root{ --page-x: 40px; --page-max: 1120px; }
 
-    body{ background:#eef1f4; }
+    body{ background:var(--page-bg); }
 
     header.top{
       position:sticky;
       top:0;
       z-index:30;
-      background:rgba(255,255,255,0.92);
+      background:var(--header-bg);
       backdrop-filter:saturate(180%) blur(8px);
       -webkit-backdrop-filter:saturate(180%) blur(8px);
       border-bottom:1px solid var(--card-border);
@@ -836,7 +873,7 @@
 
     footer{
       border-top:none;
-      background:#fff;
+      background:var(--surface);
       border:1px solid var(--card-border);
       border-radius:14px;
       padding:18px 20px;
@@ -845,6 +882,16 @@
     .footer-util{ justify-content:flex-start; }
   }
 </style>
+<script>
+  /* Wczesne ustawienie motywu (przed narysowaniem strony), żeby uniknąć "mignięcia" jasnym tłem */
+  (function(){
+    try{
+      if(localStorage.getItem('biblePlanTheme_v1') === 'dark'){
+        document.documentElement.classList.add('theme-dark');
+      }
+    }catch(e){}
+  })();
+</script>
 </head>
 <body>
 
@@ -873,6 +920,7 @@
         <button class="nav-link active" data-target="page-today" type="button">Dziś</button>
         <button class="nav-link" data-target="page-progress" type="button">Postęp</button>
         <button class="nav-link" data-target="page-plan" type="button">Plan</button>
+        <button class="nav-link" data-target="page-bible" type="button">Biblia</button>
         <button class="nav-link" data-target="page-more" type="button">Więcej</button>
       </nav>
     </div>
@@ -960,9 +1008,51 @@
       </div>
     </section>
 
+    <section class="app-page" id="page-bible">
+      <div class="wrap">
+        <h2 class="page-heading">Biblia</h2>
+        <section class="dash">
+          <div class="settings-row" style="margin-top:0;padding-top:0;border-top:none;">
+            <label for="bibleBookSelect">Księga:</label>
+            <select id="bibleBookSelect"></select>
+            <label for="bibleChapterSelect">Rozdział:</label>
+            <select id="bibleChapterSelect"></select>
+            <button id="bibleShowBtn" type="button" class="btn-primary" style="background:var(--navy-dark);color:#fff;">📖 Pokaż</button>
+          </div>
+        </section>
+        <section class="inline-reader" id="bibleInlineReader">
+          <div class="reader-head">
+            <span class="reader-title" id="bibleReaderTitle">Wybierz księgę i rozdział, aby zobaczyć tekst</span>
+            <span class="reader-head-actions">
+              <a id="bibleReaderOpenTab" href="#" target="_blank" rel="noopener">⤢ Nowa karta</a>
+              <button id="bibleReaderExpandBtn" type="button">🔍 Powiększ</button>
+              <button id="bibleReaderBackBtn" type="button">‹ POWRÓT</button>
+            </span>
+          </div>
+          <div class="reader-body">
+            <div class="reader-placeholder" id="bibleReaderPlaceholder">📖 Tekst rozdziału pojawi się tutaj.</div>
+            <div class="reader-loading" id="bibleReaderLoading" style="display:none;">
+              <div class="reader-spinner"></div>
+              <span>Wczytuję tekst…</span>
+            </div>
+            <div class="reader-fallback" id="bibleReaderFallback">
+              <p>Nie udało się wczytać tekstu wewnątrz aplikacji (strona pismoswiete.pl może wymagać zalogowania lub blokować osadzanie). Otwórz fragment w nowej karcie.</p>
+              <a class="btn-primary" id="bibleReaderFallbackLink" href="#" target="_blank" rel="noopener" style="background:var(--navy-dark);color:#fff;padding:10px 18px;border-radius:10px;">Otwórz w nowej karcie</a>
+            </div>
+            <iframe id="bibleReaderFrame" title="Tekst Pisma Świętego" referrerpolicy="no-referrer" style="display:none;"></iframe>
+          </div>
+        </section>
+        <div class="reader-backdrop" id="bibleReaderBackdrop"></div>
+      </div>
+    </section>
+
     <section class="app-page" id="page-more">
       <div class="wrap">
         <h2 class="page-heading">Więcej</h2>
+        <div class="util-bar">
+          <button id="refreshBtn">🔄 Odśwież stronę</button>
+          <button id="themeToggleBtn">🌙 Ciemny motyw</button>
+        </div>
         <footer>
           <div class="util-bar footer-util">
             <button id="exportBtn">⭳ Eksportuj postęp</button>
@@ -984,6 +1074,9 @@
     </button>
     <button class="tab-btn" data-target="page-plan" type="button">
       <span class="icon">📅</span><span>Plan</span>
+    </button>
+    <button class="tab-btn" data-target="page-bible" type="button">
+      <span class="icon">📚</span><span>Biblia</span>
     </button>
     <button class="tab-btn" data-target="page-more" type="button">
       <span class="icon">⚙️</span><span>Więcej</span>
@@ -1509,6 +1602,187 @@ readerBackdrop.addEventListener('click', () => setReaderFullscreen(false));
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Escape' && inlineReader.classList.contains('is-fullscreen')) setReaderFullscreen(false);
 });
+
+/* ================= ZAKŁADKA "BIBLIA": dowolna księga i rozdział =================
+   Ta sama mechanika czytnika co na stronie "Dziś" (osadzona ramka <iframe> do
+   pismoswiete.pl), ale z własnym wyborem księgi i rozdziału zamiast planu dnia. */
+const BIBLE_BOOKS = [
+  {abbr:'Rdz', name:'Rodzaju', chapters:50},
+  {abbr:'Wj', name:'Wyjścia', chapters:40},
+  {abbr:'Kpł', name:'Kapłańska', chapters:27},
+  {abbr:'Lb', name:'Liczb', chapters:36},
+  {abbr:'Pwt', name:'Powtórzonego Prawa', chapters:34},
+  {abbr:'Joz', name:'Jozuego', chapters:24},
+  {abbr:'Sdz', name:'Sędziów', chapters:21},
+  {abbr:'Rt', name:'Rut', chapters:4},
+  {abbr:'1 Sm', name:'1 Samuela', chapters:31},
+  {abbr:'2 Sm', name:'2 Samuela', chapters:24},
+  {abbr:'1 Krl', name:'1 Królewska', chapters:22},
+  {abbr:'2 Krl', name:'2 Królewska', chapters:25},
+  {abbr:'1 Krn', name:'1 Kronik', chapters:29},
+  {abbr:'2 Krn', name:'2 Kronik', chapters:36},
+  {abbr:'Ezd', name:'Ezdrasza', chapters:10},
+  {abbr:'Ne', name:'Nehemiasza', chapters:13},
+  {abbr:'Tb', name:'Tobiasza', chapters:14},
+  {abbr:'Jdt', name:'Judyty', chapters:16},
+  {abbr:'Est', name:'Estery', chapters:10},
+  {abbr:'1 Mch', name:'1 Machabejska', chapters:16},
+  {abbr:'2 Mch', name:'2 Machabejska', chapters:15},
+  {abbr:'Hi', name:'Hioba', chapters:42},
+  {abbr:'Ps', name:'Psalmów', chapters:150},
+  {abbr:'Prz', name:'Przysłów', chapters:31},
+  {abbr:'Koh', name:'Koheleta', chapters:12},
+  {abbr:'Pnp', name:'Pieśń nad Pieśniami', chapters:8},
+  {abbr:'Mdr', name:'Mądrości', chapters:19},
+  {abbr:'Syr', name:'Syracha (Mądrość Syracha)', chapters:51},
+  {abbr:'Iz', name:'Izajasza', chapters:66},
+  {abbr:'Jr', name:'Jeremiasza', chapters:52},
+  {abbr:'Lm', name:'Lamentacje', chapters:5},
+  {abbr:'Ba', name:'Barucha', chapters:6},
+  {abbr:'Ez', name:'Ezechiela', chapters:48},
+  {abbr:'Dn', name:'Daniela', chapters:14},
+  {abbr:'Oz', name:'Ozeasza', chapters:14},
+  {abbr:'Jl', name:'Joela', chapters:4},
+  {abbr:'Am', name:'Amosa', chapters:9},
+  {abbr:'Ab', name:'Abdiasza', chapters:1},
+  {abbr:'Jon', name:'Jonasza', chapters:4},
+  {abbr:'Mi', name:'Micheasza', chapters:7},
+  {abbr:'Na', name:'Nahuma', chapters:3},
+  {abbr:'Ha', name:'Habakuka', chapters:3},
+  {abbr:'So', name:'Sofoniasza', chapters:3},
+  {abbr:'Ag', name:'Aggeusza', chapters:2},
+  {abbr:'Za', name:'Zachariasza', chapters:14},
+  {abbr:'Ml', name:'Malachiasza', chapters:3},
+  {abbr:'Mt', name:'Mateusza', chapters:28},
+  {abbr:'Mk', name:'Marka', chapters:16},
+  {abbr:'Łk', name:'Łukasza', chapters:24},
+  {abbr:'J', name:'Jana', chapters:21},
+  {abbr:'Dz', name:'Dzieje Apostolskie', chapters:28},
+  {abbr:'Rz', name:'Rzymian', chapters:16},
+  {abbr:'1 Kor', name:'1 Koryntian', chapters:16},
+  {abbr:'2 Kor', name:'2 Koryntian', chapters:13},
+  {abbr:'Ga', name:'Galatów', chapters:6},
+  {abbr:'Ef', name:'Efezjan', chapters:6},
+  {abbr:'Flp', name:'Filipian', chapters:4},
+  {abbr:'Kol', name:'Kolosan', chapters:4},
+  {abbr:'1 Tes', name:'1 Tesaloniczan', chapters:5},
+  {abbr:'2 Tes', name:'2 Tesaloniczan', chapters:3},
+  {abbr:'1 Tm', name:'1 Tymoteusza', chapters:6},
+  {abbr:'2 Tm', name:'2 Tymoteusza', chapters:4},
+  {abbr:'Tt', name:'Tytusa', chapters:3},
+  {abbr:'Flm', name:'Filemona', chapters:1},
+  {abbr:'Hbr', name:'Hebrajczyków', chapters:13},
+  {abbr:'Jk', name:'Jakuba', chapters:5},
+  {abbr:'1 P', name:'1 Piotra', chapters:5},
+  {abbr:'2 P', name:'2 Piotra', chapters:3},
+  {abbr:'1 J', name:'1 Jana', chapters:5},
+  {abbr:'2 J', name:'2 Jana', chapters:1},
+  {abbr:'3 J', name:'3 Jana', chapters:1},
+  {abbr:'Jud', name:'Judy', chapters:1},
+  {abbr:'Ap', name:'Apokalipsa (Objawienie)', chapters:22},
+];
+
+const bibleBookSelect = document.getElementById('bibleBookSelect');
+const bibleChapterSelect = document.getElementById('bibleChapterSelect');
+
+function populateBibleBooks(){
+  bibleBookSelect.innerHTML = BIBLE_BOOKS.map(b => `<option value="${b.abbr}">${b.abbr} — ${b.name}</option>`).join('');
+}
+function populateBibleChapters(){
+  const book = BIBLE_BOOKS.find(b => b.abbr === bibleBookSelect.value) || BIBLE_BOOKS[0];
+  const opts = [];
+  for(let i=1;i<=book.chapters;i++) opts.push(`<option value="${i}">${i}</option>`);
+  bibleChapterSelect.innerHTML = opts.join('');
+}
+populateBibleBooks();
+populateBibleChapters();
+bibleBookSelect.addEventListener('change', populateBibleChapters);
+
+function bibleChapterUrl(bookAbbrev, chapter){
+  const slug = encodeURIComponent(bookSlug(bookAbbrev));
+  return `https://pismoswiete.pl/demo#/tome/${slug}/chapter/${chapter}/0`;
+}
+
+const bibleReaderFrame = document.getElementById('bibleReaderFrame');
+const bibleReaderLoading = document.getElementById('bibleReaderLoading');
+const bibleReaderFallback = document.getElementById('bibleReaderFallback');
+const bibleReaderPlaceholder = document.getElementById('bibleReaderPlaceholder');
+const bibleReaderTitle = document.getElementById('bibleReaderTitle');
+const bibleReaderOpenTab = document.getElementById('bibleReaderOpenTab');
+const bibleReaderFallbackLink = document.getElementById('bibleReaderFallbackLink');
+let bibleReaderFallbackTimer = null;
+
+function openBibleReader(bookAbbrev, chapter, label){
+  const url = bibleChapterUrl(bookAbbrev, chapter);
+
+  bibleReaderTitle.textContent = label;
+  bibleReaderOpenTab.href = url;
+  bibleReaderFallbackLink.href = url;
+  bibleReaderFallback.classList.remove('show');
+  bibleReaderPlaceholder.style.display = 'none';
+  bibleReaderFrame.style.display = 'block';
+  bibleReaderLoading.style.display = 'flex';
+  bibleReaderFrame.src = url;
+
+  if(bibleReaderFallbackTimer) clearTimeout(bibleReaderFallbackTimer);
+  bibleReaderFallbackTimer = setTimeout(() => {
+    bibleReaderFallback.classList.add('show');
+    bibleReaderLoading.style.display = 'none';
+  }, 6000);
+
+  document.getElementById('bibleInlineReader').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+bibleReaderFrame.addEventListener('load', () => {
+  if(!bibleReaderFrame.src || bibleReaderFrame.src === 'about:blank') return;
+  if(bibleReaderFallbackTimer) clearTimeout(bibleReaderFallbackTimer);
+  bibleReaderLoading.style.display = 'none';
+});
+
+document.getElementById('bibleShowBtn').onclick = () => {
+  const abbr = bibleBookSelect.value;
+  const chapter = bibleChapterSelect.value;
+  const bookInfo = BIBLE_BOOKS.find(b => b.abbr === abbr);
+  openBibleReader(abbr, chapter, `${abbr} ${chapter}${bookInfo ? ' · ' + bookInfo.name : ''}`);
+};
+
+/* ---- "Powiększ" dla ramki w zakładce "Biblia", ta sama mechanika co na stronie "Dziś" ---- */
+const bibleInlineReader = document.getElementById('bibleInlineReader');
+const bibleReaderExpandBtn = document.getElementById('bibleReaderExpandBtn');
+const bibleReaderBackBtn = document.getElementById('bibleReaderBackBtn');
+const bibleReaderBackdrop = document.getElementById('bibleReaderBackdrop');
+
+function setBibleReaderFullscreen(on){
+  bibleInlineReader.classList.toggle('is-fullscreen', on);
+  bibleReaderBackdrop.classList.toggle('show', on);
+  document.body.classList.toggle('reader-fullscreen-lock', on);
+}
+bibleReaderExpandBtn.addEventListener('click', () => setBibleReaderFullscreen(true));
+bibleReaderBackBtn.addEventListener('click', () => setBibleReaderFullscreen(false));
+bibleReaderBackdrop.addEventListener('click', () => setBibleReaderFullscreen(false));
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && bibleInlineReader.classList.contains('is-fullscreen')) setBibleReaderFullscreen(false);
+});
+
+/* ================= USTAWIENIA: odświeżenie strony i motyw jasny/ciemny ================= */
+document.getElementById('refreshBtn').onclick = () => location.reload();
+
+const THEME_KEY = 'biblePlanTheme_v1';
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+function applyTheme(theme){
+  document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Jasny motyw' : '🌙 Ciemny motyw';
+  if(themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0b1116' : '#152a3e');
+}
+let currentTheme = 'light';
+try{ currentTheme = localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; }catch(e){}
+applyTheme(currentTheme);
+themeToggleBtn.onclick = () => {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  try{ localStorage.setItem(THEME_KEY, currentTheme); }catch(e){}
+  applyTheme(currentTheme);
+};
 
 /* ================= RENDER: DASHBOARD ================= */
 function renderDashboard(){
