@@ -1562,6 +1562,16 @@ function openReader(refStr, label){
   const url = pismoswieteUrl(refStr);
   if(!url){ alert('Nie udało się rozpoznać tego fragmentu do wyświetlenia.'); return; }
 
+  // Jeśli strona jest otwarta wewnątrz naszej appki Android (most JS
+  // wstrzyknięty przez natywny kod appki), NIE ładujemy pismoswiete.pl
+  // w ramce <iframe> — przeglądarki blokują wtedy cookie sesji logowania
+  // (atrybut SameSite). Zamiast tego prosimy appkę o otwarcie tej strony
+  // jako zwykłej, pełnoekranowej nawigacji, gdzie logowanie działa normalnie.
+  if(window.AndroidReaderBridge && window.AndroidReaderBridge.open){
+    window.AndroidReaderBridge.open(url, label);
+    return;
+  }
+
   readerTitle.textContent = label;
   readerOpenTab.href = url;
   readerFallbackLink.href = url;
@@ -1721,6 +1731,13 @@ let bibleReaderFallbackTimer = null;
 
 function openBibleReader(bookAbbrev, chapter, label){
   const url = bibleChapterUrl(bookAbbrev, chapter);
+
+  // Jak wyżej w openReader(): w appce Android otwieramy pełnoekranowo
+  // natywnie zamiast w ramce, żeby logowanie/sesja działały poprawnie.
+  if(window.AndroidReaderBridge && window.AndroidReaderBridge.open){
+    window.AndroidReaderBridge.open(url, label);
+    return;
+  }
 
   bibleReaderTitle.textContent = label;
   bibleReaderOpenTab.href = url;
