@@ -520,7 +520,8 @@
     white-space:nowrap;
   }
   .inline-reader .reader-head-actions{flex:none;display:flex;align-items:center;gap:6px;}
-  .inline-reader .reader-head-actions a{
+  .inline-reader .reader-head-actions a,
+  .inline-reader .reader-head-actions button{
     background:rgba(255,255,255,0.12);
     color:#fff;
     border:none;
@@ -528,13 +529,16 @@
     padding:7px 10px;
     font-size:0.8rem;
     font-family:inherit;
+    font-weight:600;
     cursor:pointer;
     text-decoration:none;
     display:inline-flex;
     align-items:center;
     gap:4px;
   }
-  .inline-reader .reader-head-actions a:hover{background:rgba(255,255,255,0.22);}
+  .inline-reader .reader-head-actions a:hover,
+  .inline-reader .reader-head-actions button:hover{background:rgba(255,255,255,0.22);}
+  #readerBackBtn{display:none;background:rgba(255,255,255,0.18) !important;}
   .inline-reader .reader-body{
     position:relative;
     height:60vh;
@@ -589,6 +593,46 @@
   }
   .inline-reader .reader-fallback.show{display:flex;}
   .inline-reader .reader-fallback p{color:var(--ink-soft);font-size:0.9rem;max-width:360px;margin:0;}
+
+  /* ---- "Powiększ": ramka rozwija się prawie na cały ekran (desktop) / na cały ekran jak osobny widok (telefon) ---- */
+  .reader-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,25,35,0.55);
+    z-index:998;
+    display:none;
+  }
+  .reader-backdrop.show{display:block;}
+  .inline-reader.is-fullscreen{
+    position:fixed;
+    z-index:999;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 24px 70px rgba(10,15,25,0.45);
+  }
+  .inline-reader.is-fullscreen .reader-body{
+    flex:1;
+    height:auto;
+    max-height:none;
+  }
+  @media (min-width:701px){
+    .inline-reader.is-fullscreen{
+      top:3vh; left:4vw; right:4vw; bottom:3vh;
+      border-radius:16px;
+      overflow:hidden;
+    }
+  }
+  @media (max-width:700px){
+    .inline-reader.is-fullscreen{
+      inset:0;
+      border-radius:0;
+    }
+  }
+  body.reader-fullscreen-lock{overflow:hidden;}
+  .inline-reader.is-fullscreen #readerExpandBtn,
+  .inline-reader.is-fullscreen #readerOpenTab{display:none;}
+  .inline-reader.is-fullscreen #readerBackBtn{display:inline-flex;}
 
   /* ===================== SYNCHRONIZACJA: przycisk ręcznej synchronizacji ===================== */
   #syncBtn{
@@ -850,6 +894,8 @@
             <span class="reader-title" id="readerTitle">Wybierz „Stary Testament” lub „Nowy Testament” powyżej, aby zobaczyć tekst</span>
             <span class="reader-head-actions">
               <a id="readerOpenTab" href="#" target="_blank" rel="noopener">⤢ Nowa karta</a>
+              <button id="readerExpandBtn" type="button">🔍 Powiększ</button>
+              <button id="readerBackBtn" type="button">‹ POWRÓT</button>
             </span>
           </div>
           <div class="reader-body">
@@ -865,6 +911,7 @@
             <iframe id="readerFrame" title="Tekst Pisma Świętego" referrerpolicy="no-referrer" style="display:none;"></iframe>
           </div>
         </section>
+        <div class="reader-backdrop" id="readerBackdrop"></div>
       </div>
     </section>
 
@@ -958,6 +1005,9 @@
 
 <script type="module">
 /* ================= PASSWORD GATE ================= */
+// Hasło nie jest przechowywane w tym pliku ani jawnie, ani jako skrót.
+// Skrót SHA-256 hasła trzymany jest w bazie Firestore (dokument config/lock)
+// i pobierany stąd przy każdym wejściu na stronę.
 let PW_HASH = null;
 let passwordHashReady = null; // Promise - ustawiany po inicjalizacji Firebase
 const PW_SESSION_KEY = 'biblePlanUnlocked_v1';
@@ -1031,7 +1081,66 @@ const PLAN = [{"d":1,"m":"Styczeń","dm":1,"ot":"Kpł 1-3","nt":"Mt 1"},{"d":2,"
 const TOTAL = PLAN.length;
 const STORAGE_KEY = 'biblePlanProgress_v1';
 
-/* ================= CLOUD SYNC (Firebase Firestore) ================= */
+/* ================= CLOUD SYNC (Firebase Firestore) =================
+   Ta strona jest statyczna (GitHub Pages), więc żeby postęp zapisywał się
+   automatycznie "w chmurze" i był widoczny na każdym urządzeniu, korzystamy
+   z darmowej bazy Firebase Firestore.
+
+   JAK URUCHOMIĆ (jednorazowo):
+   1. Wejdź na https://console.firebase.google.com i załóż darmowy projekt.
+   2. W panelu projektu: Build > Firestore Database > "Create database"
+      (wybierz tryb "Start in production mode").
+   3. W zakładce Rules skasuj całą dotychczasową zawartość i wklej dokładnie
+      poniższe reguły, po czym kliknij "Publish":
+
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+
+            match /config/lock {
+              allow read: if true;
+              allow write: if false;
+            }
+
+            match /biblePlan/progress {
+              allow read: if true;
+              allow write: if request.resource.data.pwHash ==
+                get(/databases/$(database)/documents/config/lock).data.hash;
+            }
+
+          }
+        }
+
+      (Dokument config/lock trzyma skrót hasła. Reguła pozwala zapisywać
+      postęp tylko temu, kto poda ten sam skrót co w bazie. Nikt — łącznie
+      z aplikacją — nie może nadpisać config/lock inaczej niż ręcznie
+      w konsoli Firebase).
+
+   4. W zakładce Data (Dane) utwórz kolekcję "config" z dokumentem o ID "lock"
+      i jednym polem: hash (typ: string) — patrz niżej, jak wygenerować skrót
+      swojego hasła.
+   5. W Project settings (ikona zębatki) > Your apps > kliknij ikonę "</>" (Web),
+      zarejestruj aplikację i skopiuj obiekt firebaseConfig.
+   6. Wklej go poniżej w miejsce wartości "TU_WKLEJ_...".
+   7. Wgraj plik z powrotem na GitHuba — gotowe, hasło i postęp będą trzymane
+      w bazie, a nie w tym pliku.
+
+   JAK WYGENEROWAĆ SKRÓT HASŁA (bez wpisywania go nigdzie w kodzie):
+   1. Otwórz dowolną stronę w przeglądarce, wciśnij F12 (konsola deweloperska).
+   2. Wklej poniższy kod, podmieniając TWOJE_HASLO na hasło, które chcesz
+      ustawić, i naciśnij Enter:
+
+        crypto.subtle.digest('SHA-256', new TextEncoder().encode('TWOJE_HASLO'))
+          .then(b=>console.log(Array.from(new Uint8Array(b))
+          .map(x=>x.toString(16).padStart(2,'0')).join('')));
+
+   3. Skopiuj wypisany ciąg znaków (64 znaki) i wklej go jako wartość pola
+      "hash" w dokumencie config/lock.
+
+   Dopóki nie wkleisz własnej konfiguracji Firebase i nie utworzysz dokumentu
+   config/lock, ekran logowania nie znajdzie żadnego hasła do porównania —
+   zobaczysz o tym komunikat zamiast formularza.
+*/
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -1378,6 +1487,27 @@ readerFrame.addEventListener('load', () => {
   if(!readerFrame.src || readerFrame.src === 'about:blank') return;
   if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
   readerLoading.style.display = 'none';
+});
+
+/* ---- "Powiększ": ramka rozwija się prawie na cały ekran (desktop) lub jak osobny widok (telefon) ----
+   Nie przenosimy ani nie przeładowujemy <iframe> — tylko dokładamy klasę, która przez CSS
+   ustawia ramkę na position:fixed pokrywające (prawie) cały ekran. Treść, która już się
+   wczytała, zostaje bez zmian. */
+const inlineReader = document.getElementById('inlineReader');
+const readerExpandBtn = document.getElementById('readerExpandBtn');
+const readerBackBtn = document.getElementById('readerBackBtn');
+const readerBackdrop = document.getElementById('readerBackdrop');
+
+function setReaderFullscreen(on){
+  inlineReader.classList.toggle('is-fullscreen', on);
+  readerBackdrop.classList.toggle('show', on);
+  document.body.classList.toggle('reader-fullscreen-lock', on);
+}
+readerExpandBtn.addEventListener('click', () => setReaderFullscreen(true));
+readerBackBtn.addEventListener('click', () => setReaderFullscreen(false));
+readerBackdrop.addEventListener('click', () => setReaderFullscreen(false));
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && inlineReader.classList.contains('is-fullscreen')) setReaderFullscreen(false);
 });
 
 /* ================= RENDER: DASHBOARD ================= */
