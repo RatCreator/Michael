@@ -490,18 +490,19 @@
   .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
   .dialog-actions button.close-btn{background:#eee;color:var(--ink);}
 
-  /* ===================== CZYTNIK: modal z tekstem rozdzia\u0142u (iframe pismoswiete.pl) ===================== */
-  #readerDialog{
-    max-width:900px;
-    width:96%;
-    height:88vh;
-    max-height:900px;
-    display:flex;
-    flex-direction:column;
+  /* ===================== CZYTNIK: rama z tekstem rozdziału, zawsze widoczna na stronie "Dziś" =====================
+     Zamiast otwierać pismoswiete.pl w nowej karcie/oknie, osadzamy tę stronę w <iframe>
+     na sztywno w tej ramce, poniżej przycisków ST/NT. Nigdy nie pojawia się jako
+     osobne okno / modal / nowa karta (poza jawnym linkiem zapasowym). */
+  .inline-reader{
+    background:#fff;
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
     overflow:hidden;
+    margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(20,30,45,0.05);
   }
-  #readerDialog .reader-head{
-    flex:none;
+  .inline-reader .reader-head{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -510,22 +511,16 @@
     background:var(--navy-dark);
     color:#fff;
   }
-  #readerDialog .reader-title{
+  .inline-reader .reader-title{
     font-family:'Source Serif 4',serif;
     font-weight:600;
-    font-size:1rem;
+    font-size:0.92rem;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
   }
-  #readerDialog .reader-head-actions{
-    flex:none;
-    display:flex;
-    align-items:center;
-    gap:6px;
-  }
-  #readerDialog .reader-head-actions button,
-  #readerDialog .reader-head-actions a{
+  .inline-reader .reader-head-actions{flex:none;display:flex;align-items:center;gap:6px;}
+  .inline-reader .reader-head-actions a{
     background:rgba(255,255,255,0.12);
     color:#fff;
     border:none;
@@ -539,21 +534,28 @@
     align-items:center;
     gap:4px;
   }
-  #readerDialog .reader-head-actions button:hover,
-  #readerDialog .reader-head-actions a:hover{background:rgba(255,255,255,0.22);}
-  #readerDialog .reader-body{
-    flex:1;
+  .inline-reader .reader-head-actions a:hover{background:rgba(255,255,255,0.22);}
+  .inline-reader .reader-body{
     position:relative;
+    height:60vh;
+    min-height:360px;
+    max-height:640px;
     background:#fff;
-    min-height:0;
   }
-  #readerDialog iframe{
-    width:100%;
-    height:100%;
-    border:none;
-    display:block;
+  .inline-reader iframe{width:100%;height:100%;border:none;display:block;}
+  .inline-reader .reader-placeholder{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+    color:var(--ink-soft);
+    font-size:0.9rem;
+    background:var(--card);
   }
-  #readerDialog .reader-loading{
+  .inline-reader .reader-loading{
     position:absolute;
     inset:0;
     display:flex;
@@ -564,9 +566,8 @@
     color:var(--ink-soft);
     font-size:0.85rem;
     background:#fff;
-    transition:opacity .2s ease;
   }
-  #readerDialog .reader-spinner{
+  .inline-reader .reader-spinner{
     width:26px;height:26px;
     border-radius:50%;
     border:3px solid var(--card-border);
@@ -574,7 +575,7 @@
     animation:reader-spin 0.8s linear infinite;
   }
   @keyframes reader-spin{to{transform:rotate(360deg);}}
-  #readerDialog .reader-fallback{
+  .inline-reader .reader-fallback{
     position:absolute;
     inset:0;
     display:none;
@@ -586,15 +587,17 @@
     padding:24px;
     background:#fff;
   }
-  #readerDialog .reader-fallback.show{display:flex;}
-  #readerDialog .reader-fallback p{color:var(--ink-soft);font-size:0.9rem;max-width:360px;margin:0;}
-  #readerDialog .reader-fallback a.btn-primary{
-    display:inline-block;
-    text-decoration:none;
+  .inline-reader .reader-fallback.show{display:flex;}
+  .inline-reader .reader-fallback p{color:var(--ink-soft);font-size:0.9rem;max-width:360px;margin:0;}
+
+  /* ===================== SYNCHRONIZACJA: przycisk ręcznej synchronizacji ===================== */
+  #syncBtn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
   }
-  @media (max-width:700px){
-    #readerDialog{width:100%;height:100%;max-height:none;border-radius:0;}
-  }
+  #syncBtn.is-syncing{opacity:0.7;cursor:wait;}
+  #syncBtn .sync-spin{display:inline-block;animation:reader-spin 0.8s linear infinite;}
 
   /* ===================== APP-LIKE MOBILE LAYOUT ===================== */
   .tabbar{display:none;}
@@ -842,6 +845,26 @@
         <div class="read-buttons" id="readButtons">
           <!-- filled by JS -->
         </div>
+        <section class="inline-reader" id="inlineReader">
+          <div class="reader-head">
+            <span class="reader-title" id="readerTitle">Wybierz „Stary Testament” lub „Nowy Testament” powyżej, aby zobaczyć tekst</span>
+            <span class="reader-head-actions">
+              <a id="readerOpenTab" href="#" target="_blank" rel="noopener">⤢ Nowa karta</a>
+            </span>
+          </div>
+          <div class="reader-body">
+            <div class="reader-placeholder" id="readerPlaceholder">📖 Tekst rozdziału pojawi się tutaj.</div>
+            <div class="reader-loading" id="readerLoading" style="display:none;">
+              <div class="reader-spinner"></div>
+              <span>Wczytuję tekst…</span>
+            </div>
+            <div class="reader-fallback" id="readerFallback">
+              <p>Nie udało się wczytać tekstu wewnątrz aplikacji (strona pismoswiete.pl może wymagać zalogowania lub blokować osadzanie). Otwórz fragment w nowej karcie.</p>
+              <a class="btn-primary" id="readerFallbackLink" href="#" target="_blank" rel="noopener" style="background:var(--navy-dark);color:#fff;padding:10px 18px;border-radius:10px;">Otwórz w nowej karcie</a>
+            </div>
+            <iframe id="readerFrame" title="Tekst Pisma Świętego" referrerpolicy="no-referrer" style="display:none;"></iframe>
+          </div>
+        </section>
       </div>
     </section>
 
@@ -872,6 +895,7 @@
             <label for="startDateInput">Data rozpoczęcia planu:</label>
             <input type="date" id="startDateInput">
             <span id="nominalEndNote"></span>
+            <button id="syncBtn" type="button">🔄 Synchronizuj</button>
             <span id="syncStatus" class="sync-status sync-off"></span>
           </div>
         </section>
@@ -930,34 +954,10 @@
     </div>
   </div>
 </dialog>
-
-<dialog id="readerDialog">
-  <div class="reader-head">
-    <span class="reader-title" id="readerTitle">Czytanie fragmentu</span>
-    <span class="reader-head-actions">
-      <a id="readerOpenTab" href="#" target="_blank" rel="noopener">⤢ Nowa karta</a>
-      <button id="readerCloseBtn" type="button">✕ Zamknij</button>
-    </span>
-  </div>
-  <div class="reader-body">
-    <div class="reader-loading" id="readerLoading">
-      <div class="reader-spinner"></div>
-      <span>Wczytuję tekst…</span>
-    </div>
-    <div class="reader-fallback" id="readerFallback">
-      <p>Nie udało się wczytać tekstu wewnątrz aplikacji (strona pismoswiete.pl może wymagać zalogowania lub blokować osadzanie). Otwórz fragment w nowej karcie.</p>
-      <a class="btn-primary" id="readerFallbackLink" href="#" target="_blank" rel="noopener" style="background:var(--navy-dark);color:#fff;padding:10px 18px;border-radius:10px;">Otwórz w nowej karcie</a>
-    </div>
-    <iframe id="readerFrame" title="Tekst Pisma Świętego" referrerpolicy="no-referrer"></iframe>
-  </div>
-</dialog>
 </div>
 
 <script type="module">
 /* ================= PASSWORD GATE ================= */
-// Hasło nie jest przechowywane w tym pliku ani jawnie, ani jako skrót.
-// Skrót SHA-256 hasła trzymany jest w bazie Firestore (dokument config/lock)
-// i pobierany stąd przy każdym wejściu na stronę.
 let PW_HASH = null;
 let passwordHashReady = null; // Promise - ustawiany po inicjalizacji Firebase
 const PW_SESSION_KEY = 'biblePlanUnlocked_v1';
@@ -1031,66 +1031,7 @@ const PLAN = [{"d":1,"m":"Styczeń","dm":1,"ot":"Kpł 1-3","nt":"Mt 1"},{"d":2,"
 const TOTAL = PLAN.length;
 const STORAGE_KEY = 'biblePlanProgress_v1';
 
-/* ================= CLOUD SYNC (Firebase Firestore) =================
-   Ta strona jest statyczna (GitHub Pages), więc żeby postęp zapisywał się
-   automatycznie "w chmurze" i był widoczny na każdym urządzeniu, korzystamy
-   z darmowej bazy Firebase Firestore.
-
-   JAK URUCHOMIĆ (jednorazowo):
-   1. Wejdź na https://console.firebase.google.com i załóż darmowy projekt.
-   2. W panelu projektu: Build > Firestore Database > "Create database"
-      (wybierz tryb "Start in production mode").
-   3. W zakładce Rules skasuj całą dotychczasową zawartość i wklej dokładnie
-      poniższe reguły, po czym kliknij "Publish":
-
-        rules_version = '2';
-        service cloud.firestore {
-          match /databases/{database}/documents {
-
-            match /config/lock {
-              allow read: if true;
-              allow write: if false;
-            }
-
-            match /biblePlan/progress {
-              allow read: if true;
-              allow write: if request.resource.data.pwHash ==
-                get(/databases/$(database)/documents/config/lock).data.hash;
-            }
-
-          }
-        }
-
-      (Dokument config/lock trzyma skrót hasła. Reguła pozwala zapisywać
-      postęp tylko temu, kto poda ten sam skrót co w bazie. Nikt — łącznie
-      z aplikacją — nie może nadpisać config/lock inaczej niż ręcznie
-      w konsoli Firebase).
-
-   4. W zakładce Data (Dane) utwórz kolekcję "config" z dokumentem o ID "lock"
-      i jednym polem: hash (typ: string) — patrz niżej, jak wygenerować skrót
-      swojego hasła.
-   5. W Project settings (ikona zębatki) > Your apps > kliknij ikonę "</>" (Web),
-      zarejestruj aplikację i skopiuj obiekt firebaseConfig.
-   6. Wklej go poniżej w miejsce wartości "TU_WKLEJ_...".
-   7. Wgraj plik z powrotem na GitHuba — gotowe, hasło i postęp będą trzymane
-      w bazie, a nie w tym pliku.
-
-   JAK WYGENEROWAĆ SKRÓT HASŁA (bez wpisywania go nigdzie w kodzie):
-   1. Otwórz dowolną stronę w przeglądarce, wciśnij F12 (konsola deweloperska).
-   2. Wklej poniższy kod, podmieniając TWOJE_HASLO na hasło, które chcesz
-      ustawić, i naciśnij Enter:
-
-        crypto.subtle.digest('SHA-256', new TextEncoder().encode('TWOJE_HASLO'))
-          .then(b=>console.log(Array.from(new Uint8Array(b))
-          .map(x=>x.toString(16).padStart(2,'0')).join('')));
-
-   3. Skopiuj wypisany ciąg znaków (64 znaki) i wklej go jako wartość pola
-      "hash" w dokumencie config/lock.
-
-   Dopóki nie wkleisz własnej konfiguracji Firebase i nie utworzysz dokumentu
-   config/lock, ekran logowania nie znajdzie żadnego hasła do porównania —
-   zobaczysz o tym komunikat zamiast formularza.
-*/
+/* ================= CLOUD SYNC (Firebase Firestore) ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
@@ -1180,6 +1121,65 @@ function subscribeToCloud(){
     setSyncStatus('offline');
   });
 }
+
+/* ================= SYNCHRONIZACJA RĘCZNA (przycisk "Synchronizuj") =================
+   Pobiera najnowszy stan z chmury (jeśli jest nowszy niż lokalny), a następnie
+   wypycha bieżący stan z powrotem do chmury — czyli działa w obie strony na żądanie,
+   niezależnie od automatycznej synchronizacji w tle. */
+async function manualSync(){
+  const btn = document.getElementById('syncBtn');
+  if(!btn || btn.classList.contains('is-syncing')) return;
+
+  if(!CLOUD_ENABLED || !db){
+    setSyncStatus('off');
+    alert('Synchronizacja z chmurą nie jest skonfigurowana w tym pliku (brak firebaseConfig) — dane zapisują się tylko lokalnie w tej przeglądarce.');
+    return;
+  }
+
+  btn.classList.add('is-syncing');
+  btn.disabled = true;
+  const originalLabel = btn.innerHTML;
+  btn.innerHTML = '<span class="sync-spin">🔄</span> Synchronizuję…';
+  setSyncStatus('syncing');
+
+  try{
+    if(passwordHashReady) await passwordHashReady;
+
+    const snap = await getDoc(cloudDocRef);
+    if(snap.exists()){
+      const cloud = snap.data();
+      if(cloud && cloud.status){
+        const cloudUpdated = cloud.updatedAt || 0;
+        const localUpdated = state.updatedAt || 0;
+        if(cloudUpdated > localUpdated){
+          state = {
+            startDate: cloud.startDate,
+            status: cloud.status,
+            lastMarkDate: cloud.lastMarkDate,
+            lastSkipDate: cloud.lastSkipDate,
+            updatedAt: cloudUpdated
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          renderAll();
+        }
+      }
+    }
+
+    if(PW_HASH){
+      await setDoc(cloudDocRef, { ...state, pwHash: PW_HASH });
+    }
+    setSyncStatus('synced');
+  }catch(e){
+    console.warn('Ręczna synchronizacja nie powiodła się.', e);
+    setSyncStatus('offline');
+    alert('Nie udało się zsynchronizować z chmurą. Sprawdź połączenie z internetem i spróbuj ponownie.');
+  }finally{
+    btn.classList.remove('is-syncing');
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+  }
+}
+document.getElementById('syncBtn').addEventListener('click', manualSync);
 
 /* ================= STATE ================= */
 function todayISO(){
@@ -1333,15 +1333,17 @@ function pismoswieteUrl(refStr){
   return `https://pismoswiete.pl/demo#/tome/${slug}/chapter/${ref.chapter}/0`;
 }
 
-/* ================= CZYTNIK: modal z tekstem rozdziału (bez opuszczania strony) =================
-   Zamiast otwierać pismoswiete.pl w nowej karcie, osadzamy tę stronę w <iframe>
-   wewnątrz modala na index(2).html. Uwaga: pismoswiete.pl może blokować osadzanie
-   (nagłówek X-Frame-Options / CSP) albo wymagać zalogowania do pełnej treści — w takim
-   wypadku po krótkim czasie pokazujemy zapasowy przycisk "Otwórz w nowej karcie". */
-const readerDialog = document.getElementById('readerDialog');
+/* ================= CZYTNIK: rama z tekstem rozdziału na stronie "Dziś" =================
+   Zamiast otwierać pismoswiete.pl w nowej karcie lub osobnym oknie, osadzamy tę stronę
+   w <iframe> na sztywno w ramce pod przyciskami ST/NT. Nigdy nie pojawia się jako modal
+   ani nowa karta (poza jawnym, opcjonalnym linkiem zapasowym/awaryjnym).
+   Uwaga: pismoswiete.pl może blokować osadzanie (nagłówek X-Frame-Options / CSP) albo
+   wymagać zalogowania do pełnej treści — w takim wypadku po krótkim czasie pokazujemy
+   zapasowy przycisk "Otwórz w nowej karcie" zamiast pustej ramki. */
 const readerFrame = document.getElementById('readerFrame');
 const readerLoading = document.getElementById('readerLoading');
 const readerFallback = document.getElementById('readerFallback');
+const readerPlaceholder = document.getElementById('readerPlaceholder');
 const readerTitle = document.getElementById('readerTitle');
 const readerOpenTab = document.getElementById('readerOpenTab');
 const readerFallbackLink = document.getElementById('readerFallbackLink');
@@ -1355,41 +1357,27 @@ function openReader(refStr, label){
   readerOpenTab.href = url;
   readerFallbackLink.href = url;
   readerFallback.classList.remove('show');
-  readerLoading.style.opacity = '1';
+  readerPlaceholder.style.display = 'none';
+  readerFrame.style.display = 'block';
   readerLoading.style.display = 'flex';
   readerFrame.src = url;
 
   if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
   // Jeśli strona nie zdąży się załadować (np. blokuje osadzanie w ramce),
-  // po kilku sekundach pokazujemy zapasowy link zamiast pustego okna.
+  // po kilku sekundach pokazujemy zapasowy link zamiast pustej ramki.
   readerFallbackTimer = setTimeout(() => {
     readerFallback.classList.add('show');
     readerLoading.style.display = 'none';
   }, 6000);
 
-  if(typeof readerDialog.showModal === 'function'){
-    readerDialog.showModal();
-  }
+  // Przewiń ramkę w pole widzenia, żeby było wiadomo, że coś się właśnie wczytało.
+  document.getElementById('inlineReader').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 readerFrame.addEventListener('load', () => {
-  if(!readerFrame.src) return;
+  if(!readerFrame.src || readerFrame.src === 'about:blank') return;
   if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
   readerLoading.style.display = 'none';
-});
-
-function closeReader(){
-  if(readerFallbackTimer) clearTimeout(readerFallbackTimer);
-  readerFrame.src = 'about:blank';
-  readerDialog.close();
-}
-document.getElementById('readerCloseBtn').onclick = closeReader;
-readerDialog.addEventListener('cancel', closeReader);
-readerDialog.addEventListener('click', (e) => {
-  // Kliknięcie w tło (poza treścią modala) zamyka okno.
-  const rect = readerDialog.getBoundingClientRect();
-  const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
-  if(!inside) closeReader();
 });
 
 /* ================= RENDER: DASHBOARD ================= */
