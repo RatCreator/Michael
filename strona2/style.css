@@ -141,3 +141,59 @@ main{max-width:1040px;margin:0 auto;padding:24px 16px 60px}
   .chat{left:8px;right:8px;width:auto;bottom:calc(72px + env(safe-area-inset-bottom));
     height:calc(100dvh - 150px - env(safe-area-inset-bottom))}
 }
+
+/* ---------- poprawki mobilne ---------- */
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+button,.drop,.tag,.seg button{touch-action:manipulation}
+@media (max-width:700px){
+  body{padding:0;font-size:16px}
+  /* 16px w polach zapobiega automatycznemu powiększaniu strony na iPhonie */
+  input,textarea,select{font-size:16px}
+  input,select{min-height:46px}
+  input[type=search],textarea{-webkit-appearance:none;appearance:none}
+
+  .login{position:fixed;inset:0;min-height:0;overflow:auto;padding:20px}
+  .login-box{padding:26px 20px}
+
+  .top{flex-wrap:nowrap;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+  .who{display:flex;align-items:center;gap:10px;min-width:0;font-size:.82rem}
+  #whoName{max-width:36vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .link{min-height:40px;padding:0 4px}
+  .top nav button{min-height:54px;justify-content:center}
+
+  main{overscroll-behavior-x:contain}
+  .tab{overscroll-behavior-y:contain}
+  .tab h2{font-size:1.3rem;margin-bottom:12px}
+
+  .panel{max-width:none;padding:16px;border-radius:12px}
+  .seg{gap:6px}
+  .seg button{flex:1 1 0;min-width:0;min-height:46px;font-size:.88rem;padding:6px 4px}
+  .btn{min-height:48px;padding:0 20px;border-radius:10px}
+  .row{flex-wrap:wrap}
+  .row .btn{flex:1 1 100%}
+  .drop{padding:22px 14px}
+
+  .filters{grid-template-columns:1fr 1fr;gap:8px}
+  .filters input{grid-column:1/-1}
+  .grid{columns:1}
+  .feed{max-width:none;gap:12px}
+  .card .in{padding:12px 14px}
+  .tag{padding:3px 10px;font-size:.8rem}
+  .meta{font-size:.82rem}
+  .del{min-height:36px}
+
+  .user{padding:12px}
+  .user .nm{flex:1 1 100%}
+  .user button{min-height:42px;padding:6px 12px;font-size:.85rem}
+
+  .fab{width:56px;height:56px}
+  /* czat na pełnym ekranie jak w aplikacji, dopasowany do klawiatury */
+  .chat{left:0;right:0;bottom:auto;top:var(--vvt,0px);width:100%;height:var(--vvh,100dvh);
+    border:0;border-radius:0}
+  .chat-head{padding:calc(6px + env(safe-area-inset-top)) 8px 6px 6px}
+  .ctabs button{min-height:44px}
+  .chat-head .link{min-width:44px;min-height:44px;font-size:1.15rem}
+  .cm{max-width:88%}
+  .cform{padding:10px 10px calc(10px + env(safe-area-inset-bottom))}
+  .cform .btn{min-height:46px}
+}
