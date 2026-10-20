@@ -104,8 +104,12 @@
         <button data-ct="chat" class="on">Czat</button>
         <button data-ct="who">Online <span id="onN">0</span></button>
       </div>
-      <button id="chatClose" class="link" aria-label="Zamknij">✕</button>
+      <span class="chat-act">
+        <button id="chatClear" class="link" hidden>Wyczyść</button>
+        <button id="chatClose" class="link" aria-label="Zamknij">✕</button>
+      </span>
     </div>
+    <div id="chatNote" class="cnote">Wiadomości znikają po 2 godzinach.</div>
     <div id="chatMsgs" class="cmsgs"></div>
     <form id="chatForm" class="cform">
       <input id="chatInput" maxlength="500" placeholder="Napisz wiadomość…" autocomplete="off">
