@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Skrzynka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Newsreader:ital,wght@0,400;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section id="login" class="login">
+  <form id="loginForm" class="login-box">
+    <h1>Skrzynka</h1>
+    <p>Zaloguj się, aby wejść.</p>
+    <input type="email" id="loginEmail" placeholder="E-mail" required autocomplete="username">
+    <input type="password" id="loginPass" placeholder="Hasło" required autocomplete="current-password">
+    <button class="btn" type="submit">Zaloguj</button>
+    <div id="loginMsg" class="msg"></div>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <strong class="brand">Skrzynka</strong>
+    <nav id="nav">
+      <button data-tab="create">Utwórz</button>
+      <button data-tab="browse" class="on">Przeglądaj</button>
+      <button data-tab="latest">Najnowsze</button>
+      <button data-tab="admin" id="adminTabBtn" hidden>Użytkownicy</button>
+    </nav>
+    <span class="who"><span id="whoName"></span> <button id="logoutBtn" class="link">Wyloguj</button></span>
+  </header>
+
+  <main>
+    <section id="tab-create" class="tab" hidden>
+      <h2>Nowy wpis</h2>
+      <form id="postForm" class="panel">
+        <div class="seg" id="typeSeg">
+          <button type="button" data-type="text" class="on">Tekst</button>
+          <button type="button" data-type="image">Zdjęcie / mem</button>
+          <button type="button" data-type="quote">Cytat</button>
+        </div>
+        <label>Tytuł <input id="pTitle" maxlength="120" placeholder="Krótki tytuł"></label>
+        <label id="bodyLabel"><span id="bodyCap">Treść</span>
+          <textarea id="pBody" rows="6" maxlength="5000"></textarea></label>
+        <label id="srcWrap" hidden>Autor cytatu <input id="pSource" maxlength="120" placeholder="np. Jan Kowalski"></label>
+        <div id="imgWrap" hidden>
+          <label class="drop" id="drop">
+            <input type="file" id="pFile" accept="image/*" hidden>
+            <span id="dropTxt">Wybierz lub upuść obraz</span>
+            <img id="preview" alt="" hidden>
+          </label>
+        </div>
+        <label>Tagi <input id="pTags" placeholder="oddzielone przecinkami: śmieszne, życie"></label>
+        <div class="row"><button class="btn" type="submit" id="postBtn">Opublikuj</button><span id="postMsg" class="msg"></span></div>
+      </form>
+    </section>
+
+    <section id="tab-browse" class="tab">
+      <h2>Przeglądaj</h2>
+      <div class="filters">
+        <input id="q" type="search" placeholder="Szukaj w tytule, treści, tagach, autorze…">
+        <select id="fType"><option value="">Wszystkie typy</option><option value="text">Tekst</option><option value="image">Zdjęcia / memy</option><option value="quote">Cytaty</option></select>
+        <select id="fSort">
+          <option value="new">Najnowsze</option><option value="old">Najstarsze</option>
+          <option value="title">Tytuł A–Z</option><option value="author">Autor A–Z</option>
+        </select>
+        <select id="fTag"><option value="">Wszystkie tagi</option></select>
+      </div>
+      <div id="count" class="count"></div>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <section id="tab-latest" class="tab" hidden>
+      <h2>Najnowsze</h2>
+      <div id="feed" class="feed"></div>
+    </section>
+
+    <section id="tab-admin" class="tab" hidden>
+      <h2>Użytkownicy</h2>
+      <form id="userForm" class="panel">
+        <div class="two">
+          <input id="uName" placeholder="Nazwa wyświetlana" required>
+          <input id="uEmail" type="email" placeholder="E-mail" required>
+          <input id="uPass" type="text" placeholder="Hasło startowe (min. 6 znaków)" minlength="6" required>
+          <select id="uRole"><option value="user">Użytkownik</option><option value="admin">Administrator</option></select>
+        </div>
+        <div class="row"><button class="btn" type="submit">Dodaj użytkownika</button><span id="userMsg" class="msg"></span></div>
+      </form>
+      <div id="userList" class="users"></div>
+    </section>
+  </main>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
