@@ -397,7 +397,7 @@ $('chatMsgs').addEventListener('click', async e => {
 
 /* ---------- powiadomienia push (FCM) i przypominajki ---------- */
 // Klucz VAPID: Firebase → Ustawienia projektu → Cloud Messaging → Web Push certificates → Generate key pair
-const VAPID_KEY = 'WKLEJ_TUTAJ_KLUCZ_VAPID';
+const VAPID_KEY = 'BKu5CPaMR1kzu-Jcu5TC8ql0Z-nIOYIgQfd83xXHQax8-9sg1hIMJJBzRpm8KlpnOWrNQ5xzssZp3q0qCgoj8Q0';
 let swReg = null;
 async function getSW() {
   if (!swReg) swReg = await navigator.serviceWorker.register('firebase-messaging-sw.js', { scope: './' });
