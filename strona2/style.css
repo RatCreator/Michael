@@ -250,3 +250,26 @@ button,.drop,.tag,.seg button{touch-action:manipulation}
   .chat-act #chatClear .lbl{display:none}
   .chat-act #chatClear{min-width:44px;justify-content:center;padding:0}
 }
+
+/* ---------- telefon: nic nie może wychodzić poza ekran ---------- */
+@media (max-width:700px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  #app{width:100%;max-width:100%;height:100%;height:100dvh;overflow:hidden}
+  /* main miało margin:0 auto z widoku komputerowego, przez co w układzie flex kurczyło się do szerokości treści */
+  main{width:100%;max-width:100%;margin:0;min-width:0}
+  .tab{min-width:0;max-width:100%;overflow-x:hidden}
+  .tab > *{max-width:100%;min-width:0}
+
+  .filters{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .filters > *{min-width:0}
+  .two{grid-template-columns:minmax(0,1fr)}
+  .feed,.users{grid-template-columns:minmax(0,1fr)}
+  .user .acts{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+  input,select,textarea{max-width:100%;min-width:0}
+  .card,.panel,.user{min-width:0;max-width:100%}
+  .card img.pic,.drop img{max-width:100%;height:auto}
+  .card h3,.card blockquote,.card cite,.card p,.meta,.user .nm{overflow-wrap:anywhere;word-break:break-word}
+  .top > *{min-width:0}
+  .brand{white-space:nowrap}
+}
