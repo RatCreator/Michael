@@ -1,7 +1,7 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendPasswordResetEmail}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}
+import {getFirestore,doc,getDocs,writeBatch,where,Timestamp,getDoc,setDoc,updateDoc,deleteDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import {getDatabase,ref,onValue,onDisconnect,set,serverTimestamp as rtTime}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
@@ -54,7 +54,7 @@ onAuthStateChanged(auth, async user => {
   }
   $('login').hidden = true; $('app').hidden = false;
   $('whoName').textContent = me.name || me.email;
-  $('adminTabBtn').hidden = $('tab-admin').hidden = me.role !== 'admin';
+  $('adminTabBtn').hidden = $('tab-admin').hidden = $('chatClear').hidden = me.role !== 'admin';
   $('loginPass').value = '';
   say($('loginMsg'), '');
   startPosts(); startPresence(); startChat();
@@ -295,27 +295,57 @@ function renderPresence() {
 setInterval(() => { if (me && !$('chatPanel').hidden) renderPresence(); }, 30000);
 
 /* ---------- czat (Firestore) ---------- */
+const CHAT_TTL = 2 * 3600 * 1000;   // wiadomości żyją 2 godziny
+let chatMsgs = [], chatTimer = null;
+function renderChat() {
+  const cutoff = Date.now() - CHAT_TTL;
+  const list = chatMsgs.filter(m => { const t = m.createdAt?.toMillis?.(); return !t || t >= cutoff; });
+  $('chatMsgs').innerHTML = list.map(m => {
+    const mine = m.uid === me.uid;
+    const t = m.createdAt?.toDate?.().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) || '…';
+    return `<div class="cm ${mine ? 'me' : ''}"><small>${mine ? '' : esc(m.name) + ' · '}${t}</small><div class="b">${esc(m.text)}</div></div>`;
+  }).join('') || '<div class="empty">Brak wiadomości. Napisz pierwszą.</div>';
+  $('chatMsgs').scrollTop = $('chatMsgs').scrollHeight;
+}
+// Usuwa z bazy wiadomości starsze niż 2 h (reguły pozwalają na to każdemu aktywnemu użytkownikowi)
+async function pruneChat() {
+  try {
+    const s = await getDocs(query(collection(db, 'chat'), where('createdAt', '<', Timestamp.fromMillis(Date.now() - CHAT_TTL)), limit(100)));
+    s.docs.forEach(d => deleteDoc(d.ref).catch(() => {}));
+  } catch (e) { console.warn(e); }
+}
 function startChat() {
-  chatFirst = true; unread = 0; updBadge();
-  const q = query(collection(db, 'chat'), orderBy('createdAt', 'desc'), limit(100));
+  chatFirst = true; unread = 0; updBadge(); chatMsgs = [];
+  const since = Timestamp.fromMillis(Date.now() - CHAT_TTL);
+  const q = query(collection(db, 'chat'), where('createdAt', '>=', since), orderBy('createdAt', 'desc'), limit(100));
   unsubChat = onSnapshot(q, snap => {
     if (!chatFirst && !chatOpen) {
       unread += snap.docChanges().filter(c => c.type === 'added' && c.doc.data().uid !== me.uid && !c.doc.metadata.hasPendingWrites).length;
       updBadge();
     }
     chatFirst = false;
-    $('chatMsgs').innerHTML = snap.docs.reverse().map(d => {
-      const m = d.data(), mine = m.uid === me.uid;
-      const t = m.createdAt?.toDate?.().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) || '…';
-      return `<div class="cm ${mine ? 'me' : ''}"><small>${mine ? '' : esc(m.name) + ' · '}${t}</small><div class="b">${esc(m.text)}</div></div>`;
-    }).join('') || '<div class="empty">Brak wiadomości. Napisz pierwszą.</div>';
-    $('chatMsgs').scrollTop = $('chatMsgs').scrollHeight;
+    chatMsgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
+    renderChat();
   }, e => console.warn(e));
+  pruneChat();
+  chatTimer = setInterval(() => { renderChat(); if (Math.random() < 0.1) pruneChat(); }, 60000);
 }
+$('chatClear').onclick = async () => {
+  if (!confirm('Usunąć wszystkie wiadomości czatu dla wszystkich?')) return;
+  try {
+    const s = await getDocs(collection(db, 'chat'));
+    for (let i = 0; i < s.docs.length; i += 400) {
+      const b = writeBatch(db);
+      s.docs.slice(i, i + 400).forEach(d => b.delete(d.ref));
+      await b.commit();
+    }
+  } catch (e) { console.warn(e); alert('Nie udało się wyczyścić czatu.'); }
+};
 function updBadge() { $('fabUnread').hidden = unread < 1; $('fabUnread').textContent = unread > 9 ? '9+' : unread; }
 function stopRealtime() {
   stops.forEach(f => f()); stops = [];
   if (unsubChat) { unsubChat(); unsubChat = null; }
+  if (chatTimer) { clearInterval(chatTimer); chatTimer = null; }
   presence = {}; chatOpen = false; $('chatPanel').hidden = true;
 }
 function setChatTab(t) {
