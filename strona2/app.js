@@ -222,11 +222,11 @@ function startUsers() {
     $('userList').innerHTML = list.map(u => `
       <div class="user ${u.active ? '' : 'off'}">
         <div class="nm">${esc(u.name)} <span class="pill">${u.role === 'admin' ? 'admin' : 'użytkownik'}</span><small>${esc(u.email)}</small></div>
-        ${u.id === me.uid ? '<small>to Ty</small>' : `
+        ${u.id === me.uid ? '<small>to Ty</small>' : `<div class="acts">
           <button data-act="active" data-id="${u.id}">${u.active ? 'Zablokuj' : 'Odblokuj'}</button>
           <button data-act="role" data-id="${u.id}">${u.role === 'admin' ? 'Odbierz admina' : 'Nadaj admina'}</button>
           <button data-act="reset" data-id="${u.id}" data-email="${esc(u.email)}">Reset hasła</button>
-          <button class="red" data-act="del" data-id="${u.id}">Usuń</button>`}
+          <button class="red" data-act="del" data-id="${u.id}">Usuń</button></div>`}
       </div>`).join('');
     window._users = Object.fromEntries(list.map(u => [u.id, u]));
   });

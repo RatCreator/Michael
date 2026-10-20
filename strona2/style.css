@@ -218,3 +218,35 @@ button,.drop,.tag,.seg button{touch-action:manipulation}
 .mdel:hover,.mdel:focus-visible{opacity:1;background:var(--bg)}
 .mdel:disabled{opacity:.2;cursor:wait}
 @media (max-width:700px){.mdel{width:40px;height:40px}}
+
+/* ---------- telefon: widok administratora ---------- */
+.acts{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:700px){
+  /* menu dolne z 4 zakładkami */
+  .top nav button{min-width:0;padding-left:0;padding-right:0;font-size:.64rem;letter-spacing:-.1px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top nav .ic{font-size:1.15rem}
+
+  /* panel użytkowników: przyciski w siatce 2x2 na całą szerokość */
+  .user{align-items:flex-start}
+  .user .acts{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .user .acts button{min-height:44px;width:100%;font-size:.84rem}
+  .user .nm{min-width:0;overflow-wrap:anywhere}
+  #userForm .two{grid-template-columns:1fr}
+
+  /* przycisk „Usuń” pod wpisami */
+  .del{border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-height:36px;text-decoration:none;background:var(--bg)}
+  .meta{row-gap:8px}
+
+  /* czat: zmieszczenie przycisków admina w nagłówku */
+  .chat-head{gap:6px}
+  .ctabs button{padding:8px 10px;font-size:.9rem}
+  .chat-act{gap:6px;flex:none}
+  .chat-act #chatClear{min-height:44px;display:flex;align-items:center;padding:0 12px}
+  .cm{max-width:94%}
+  .mdel{width:36px;height:36px}
+}
+@media (max-width:420px){
+  .chat-act #chatClear .lbl{display:none}
+  .chat-act #chatClear{min-width:44px;justify-content:center;padding:0}
+}
