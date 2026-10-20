@@ -273,3 +273,14 @@ button,.drop,.tag,.seg button{touch-action:manipulation}
   .top > *{min-width:0}
   .brand{white-space:nowrap}
 }
+
+/* ---------- okno powiadomień ---------- */
+dialog{border:1px solid var(--line);border-radius:14px;padding:0;background:var(--surface);color:var(--ink);
+  width:min(380px,calc(100% - 32px))}
+dialog::backdrop{background:rgba(10,15,20,.55)}
+.set{padding:20px;display:grid;gap:12px}
+.set h3{margin:0;font:700 1.2rem 'Bricolage Grotesque',sans-serif}
+.set label{margin:0}
+.chk{display:flex;align-items:center;gap:10px;font-weight:500}
+.chk input{width:20px;min-width:20px;height:20px;min-height:20px;margin:0}
+.set .row{flex-wrap:wrap}

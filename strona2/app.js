@@ -1,8 +1,10 @@
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUserWithEmailAndPassword,sendPasswordResetEmail}
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,setPersistence,browserLocalPersistence,signOut,createUserWithEmailAndPassword,sendPasswordResetEmail}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {getFirestore,doc,getDocs,writeBatch,where,Timestamp,getDoc,setDoc,updateDoc,deleteDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}
+import {getFirestore,arrayUnion,doc,getDocs,writeBatch,where,Timestamp,getDoc,setDoc,updateDoc,deleteDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {getMessaging,getToken,isSupported}
+  from "https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging.js";
 import {getDatabase,ref,onValue,onDisconnect,set,serverTimestamp as rtTime}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
@@ -17,6 +19,7 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence).catch(() => {});   // logowanie zostaje na stałe
 const db = getFirestore(app);
 const rtdb = getDatabase(app);
 const $ = id => document.getElementById(id);
@@ -57,7 +60,7 @@ onAuthStateChanged(auth, async user => {
   $('adminTabBtn').hidden = $('tab-admin').hidden = $('chatClear').hidden = me.role !== 'admin';
   $('loginPass').value = '';
   say($('loginMsg'), '');
-  startPosts(); startPresence(); startChat();
+  startPosts(); startPresence(); startChat(); refreshPushToken();
   if (me.role === 'admin') startUsers();
   showTab('browse');
 });
@@ -391,3 +394,68 @@ $('chatMsgs').addEventListener('click', async e => {
   try { await deleteDoc(doc(db, 'chat', b.dataset.mid)); }
   catch (err) { console.warn(err); b.disabled = false; alert('Nie udało się usunąć wiadomości.'); }
 });
+
+/* ---------- powiadomienia push (FCM) i przypominajki ---------- */
+// Klucz VAPID: Firebase → Ustawienia projektu → Cloud Messaging → Web Push certificates → Generate key pair
+const VAPID_KEY = 'WKLEJ_TUTAJ_KLUCZ_VAPID';
+let swReg = null;
+async function getSW() {
+  if (!swReg) swReg = await navigator.serviceWorker.register('firebase-messaging-sw.js', { scope: './' });
+  await navigator.serviceWorker.ready;
+  return swReg;
+}
+async function pushSupported() {
+  return 'serviceWorker' in navigator && 'Notification' in window && await isSupported().catch(() => false);
+}
+async function fetchToken() {
+  const reg = await getSW();
+  return getToken(getMessaging(app), { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+}
+async function saveToken(token) {
+  if ((me.fcmTokens || []).includes(token)) return;
+  await updateDoc(doc(db, 'users', me.uid), { fcmTokens: arrayUnion(token) });
+  me.fcmTokens = [...(me.fcmTokens || []), token];
+}
+// po zalogowaniu cicho odświeża token, jeśli zgoda już została udzielona
+async function refreshPushToken() {
+  try { if (await pushSupported() && Notification.permission === 'granted') await saveToken(await fetchToken()); }
+  catch (e) { console.warn('Token push:', e); }
+}
+
+$('remHour').innerHTML = Array.from({ length: 18 }, (_, i) => i + 6).map(h => `<option value="${h}">${String(h).padStart(2, '0')}:00</option>`).join('');
+async function fillSettings() {
+  $('optPosts').checked = me.notifyPosts === true;
+  $('optRem').checked = typeof me.reminderHour === 'number';
+  $('remHour').value = typeof me.reminderHour === 'number' ? me.reminderHour : 20;
+  say($('setMsg'), '');
+  const ok = await pushSupported();
+  if (!ok) say($('setInfo'), 'Ta przeglądarka nie obsługuje powiadomień. Użyj Chrome na Androidzie.', 'err');
+  else if (Notification.permission === 'denied') say($('setInfo'), 'Powiadomienia są zablokowane w ustawieniach przeglądarki dla tej strony.', 'err');
+  else if (Notification.permission === 'granted' && (me.fcmTokens || []).length) say($('setInfo'), 'Powiadomienia są włączone na tym urządzeniu.', 'ok');
+  else say($('setInfo'), 'Powiadomienia nie są jeszcze włączone na tym urządzeniu.');
+  $('notifOn').hidden = !ok || (Notification.permission === 'granted' && (me.fcmTokens || []).length > 0);
+}
+$('setBtn').onclick = async () => { await fillSettings(); $('setDlg').showModal(); };
+$('setClose').onclick = () => $('setDlg').close();
+$('notifOn').onclick = async () => {
+  say($('setInfo'), 'Włączam…');
+  try {
+    if (await Notification.requestPermission() !== 'granted') return say($('setInfo'), 'Nie udzielono zgody na powiadomienia.', 'err');
+    await saveToken(await fetchToken());
+    await updateDoc(doc(db, 'users', me.uid), { notifyPosts: true });
+    me.notifyPosts = true;
+    await fillSettings();
+  } catch (e) {
+    console.warn(e);
+    say($('setInfo'), VAPID_KEY.startsWith('WKLEJ') ? 'Brak klucza VAPID w app.js.' : 'Nie udało się włączyć powiadomień.', 'err');
+  }
+};
+$('setSave').onclick = async () => {
+  const hour = $('optRem').checked ? Number($('remHour').value) : null;
+  try {
+    await updateDoc(doc(db, 'users', me.uid), { notifyPosts: $('optPosts').checked, reminderHour: hour });
+    me.notifyPosts = $('optPosts').checked; me.reminderHour = hour;
+    say($('setMsg'), (hour !== null || $('optPosts').checked) && !(me.fcmTokens || []).length
+      ? 'Zapisano, ale najpierw włącz powiadomienia na tym urządzeniu.' : 'Zapisano.', 'ok');
+  } catch (e) { console.warn(e); say($('setMsg'), 'Nie udało się zapisać.', 'err'); }
+};
