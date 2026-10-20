@@ -300,11 +300,13 @@ let chatMsgs = [], chatTimer = null;
 function renderChat() {
   const cutoff = Date.now() - CHAT_TTL;
   const list = chatMsgs.filter(m => { const t = m.createdAt?.toMillis?.(); return !t || t >= cutoff; });
-  $('chatMsgs').innerHTML = list.map(m => {
+  const html = list.map(m => {
     const mine = m.uid === me.uid;
     const t = m.createdAt?.toDate?.().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) || '…';
-    return `<div class="cm ${mine ? 'me' : ''}"><small>${mine ? '' : esc(m.name) + ' · '}${t}</small><div class="b">${esc(m.text)}</div></div>`;
-  }).join('') || '<div class="empty">Brak wiadomości. Napisz pierwszą.</div>';
+    return `<div class="cm ${mine ? 'me' : ''}"><small>${mine ? '' : esc(m.name) + ' · '}${t}</small><div class="mrow"><div class="b">${esc(m.text)}</div>${me.role === 'admin' && m.id ? `<button class="mdel" data-mid="${m.id}" aria-label="Usuń wiadomość" title="Usuń wiadomość">🗑</button>` : ''}</div></div>`;
+  }).join('');
+  $('chatMsgs').innerHTML = '<div class="cnote">🕒 Wiadomości znikają po 2 godzinach</div>' +
+    (html || '<div class="empty">Brak wiadomości. Napisz pierwszą.</div>');
   $('chatMsgs').scrollTop = $('chatMsgs').scrollHeight;
 }
 // Usuwa z bazy wiadomości starsze niż 2 h (reguły pozwalają na to każdemu aktywnemu użytkownikowi)
@@ -381,3 +383,11 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('scroll', setVV);
   setVV();
 }
+
+/* ---------- admin: usuwanie pojedynczych wiadomości ---------- */
+$('chatMsgs').addEventListener('click', async e => {
+  const b = e.target.closest('.mdel'); if (!b || me?.role !== 'admin') return;
+  b.disabled = true;
+  try { await deleteDoc(doc(db, 'chat', b.dataset.mid)); }
+  catch (err) { console.warn(err); b.disabled = false; alert('Nie udało się usunąć wiadomości.'); }
+});

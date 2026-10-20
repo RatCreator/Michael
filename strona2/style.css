@@ -124,7 +124,7 @@ main{max-width:1040px;margin:0 auto;padding:24px 16px 60px}
 .cmsgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
 .cm{max-width:82%;align-self:flex-start}
 .cm.me{align-self:flex-end}
-.cm .b{background:var(--bg);border-radius:12px;padding:7px 11px;overflow-wrap:anywhere;white-space:pre-wrap}
+.cm .b{min-width:0;background:var(--bg);border-radius:12px;padding:7px 11px;overflow-wrap:anywhere;white-space:pre-wrap}
 .cm.me .b{background:var(--accent-soft)}
 .cm small{display:block;color:var(--soft);font-size:.7rem;margin:0 4px 2px}
 .cm.me small{text-align:right}
@@ -201,3 +201,20 @@ button,.drop,.tag,.seg button{touch-action:manipulation}
 .chat-act{display:flex;align-items:center;gap:10px}
 .chat-act #chatClear{color:#f0a396;font-size:.85rem}
 .cnote{padding:6px 12px;font-size:.74rem;color:var(--soft);background:var(--bg);border-bottom:1px solid var(--line);text-align:center}
+
+/* czat: przycisk czyszczenia i dopisek o czasie życia wiadomości */
+.chat-act #chatClear{all:unset;box-sizing:border-box;cursor:pointer;background:rgba(255,255,255,.14);color:#fff;
+  font-size:.82rem;font-weight:500;padding:7px 12px;border-radius:8px;min-height:0;text-decoration:none}
+.chat-act #chatClear[hidden]{display:none}
+.chat-act #chatClear:hover{background:rgba(255,255,255,.24)}
+.cnote{align-self:center;background:var(--bg);color:var(--soft);font-size:.74rem;padding:3px 12px;
+  border-radius:99px;margin-bottom:4px;border:0;text-align:center}
+
+/* czat: usuwanie pojedynczej wiadomości (admin) */
+.mrow{display:flex;align-items:center;gap:4px}
+.cm.me .mrow{flex-direction:row-reverse}
+.mdel{flex:none;width:32px;height:32px;border:0;border-radius:50%;background:none;font-size:.9rem;
+  cursor:pointer;opacity:.45;padding:0}
+.mdel:hover,.mdel:focus-visible{opacity:1;background:var(--bg)}
+.mdel:disabled{opacity:.2;cursor:wait}
+@media (max-width:700px){.mdel{width:40px;height:40px}}

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Newsreader:ital,wght@0,400;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -105,11 +105,10 @@
         <button data-ct="who">Online <span id="onN">0</span></button>
       </div>
       <span class="chat-act">
-        <button id="chatClear" class="link" hidden>Wyczyść</button>
+        <button id="chatClear" class="clr" hidden>🗑 Wyczyść</button>
         <button id="chatClose" class="link" aria-label="Zamknij">✕</button>
       </span>
     </div>
-    <div id="chatNote" class="cnote">Wiadomości znikają po 2 godzinach.</div>
     <div id="chatMsgs" class="cmsgs"></div>
     <form id="chatForm" class="cform">
       <input id="chatInput" maxlength="500" placeholder="Napisz wiadomość…" autocomplete="off">
@@ -119,6 +118,6 @@
   </aside>
 </div>
 
-<script type="module" src="app.js"></script>
+<script type="module" src="app.js?v=4"></script>
 </body>
 </html>
