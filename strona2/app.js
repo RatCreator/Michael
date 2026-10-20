@@ -3,10 +3,13 @@ import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,createUser
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import {getFirestore,doc,getDoc,setDoc,updateDoc,deleteDoc,addDoc,collection,query,orderBy,limit,onSnapshot,serverTimestamp}
   from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {getDatabase,ref,onValue,onDisconnect,set,serverTimestamp as rtTime}
+  from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCSfbYa7cUIjgF01XcUCnOrY5mmusnRLdE",
   authDomain: "bible-12cc4.firebaseapp.com",
+  databaseURL: "https://bible-12cc4-default-rtdb.firebaseio.com",
   projectId: "bible-12cc4",
   storageBucket: "bible-12cc4.firebasestorage.app",
   messagingSenderId: "847997174570",
@@ -15,6 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const rtdb = getDatabase(app);
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const say = (el, text, cls='') => { el.textContent = text; el.className = 'msg ' + cls; };
@@ -28,9 +32,10 @@ $('loginForm').addEventListener('submit', async e => {
   try { await signInWithEmailAndPassword(auth, $('loginEmail').value.trim(), $('loginPass').value); }
   catch { say($('loginMsg'), 'Nieprawidłowy e-mail lub hasło.', 'err'); }
 });
-$('logoutBtn').onclick = () => signOut(auth);
+$('logoutBtn').onclick = async () => { await markOffline(); signOut(auth); };
 
 onAuthStateChanged(auth, async user => {
+  stopRealtime();
   if (unsubPosts) { unsubPosts(); unsubPosts = null; }
   if (unsubUsers) { unsubUsers(); unsubUsers = null; }
   if (!user) { me = null; $('app').hidden = true; $('login').hidden = false; return; }
@@ -49,21 +54,39 @@ onAuthStateChanged(auth, async user => {
   }
   $('login').hidden = true; $('app').hidden = false;
   $('whoName').textContent = me.name || me.email;
-  $('adminTabBtn').hidden = me.role !== 'admin';
+  $('adminTabBtn').hidden = $('tab-admin').hidden = me.role !== 'admin';
   $('loginPass').value = '';
   say($('loginMsg'), '');
-  startPosts();
+  startPosts(); startPresence(); startChat();
   if (me.role === 'admin') startUsers();
   showTab('browse');
 });
 
 /* ---------- zakładki ---------- */
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.hidden = t.id !== 'tab-' + name);
+const isDesk = () => matchMedia('(min-width:701px)').matches;
+let curTab = 'browse';
+function markTab(name) {
+  curTab = name;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + name));
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
-  window.scrollTo(0, 0);
 }
-$('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+function showTab(name, smooth = false) {
+  markTab(name);
+  if (isDesk()) window.scrollTo(0, 0);
+  else $('pages').scrollTo({ left: $('tab-' + name).offsetLeft, behavior: smooth ? 'smooth' : 'auto' });
+}
+$('nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab, true); });
+let scrollT = null;
+$('pages').addEventListener('scroll', () => {
+  if (isDesk()) return;
+  clearTimeout(scrollT);
+  scrollT = setTimeout(() => {
+    const tabs = [...document.querySelectorAll('.tab')].filter(t => !t.hidden);
+    const i = Math.round($('pages').scrollLeft / ($('pages').clientWidth || 1));
+    if (tabs[i]) markTab(tabs[i].id.replace('tab-', ''));
+  }, 80);
+}, { passive: true });
+window.addEventListener('resize', () => { if (!$('app').hidden) showTab(curTab); });
 
 /* ---------- posty: odczyt na żywo ---------- */
 function startPosts() {
@@ -233,4 +256,85 @@ $('userForm').addEventListener('submit', async e => {
     const m = { 'auth/email-already-in-use': 'Ten e-mail ma już konto.', 'auth/weak-password': 'Hasło jest za słabe.', 'auth/invalid-email': 'Niepoprawny e-mail.' };
     say($('userMsg'), m[err.code] || 'Nie udało się dodać użytkownika.', 'err');
   }
+});
+
+/* ---------- obecność (Realtime Database) ---------- */
+let presence = {}, stops = [], unsubChat = null, chatOpen = false, unread = 0, chatFirst = true;
+const myPres = () => ref(rtdb, 'presence/' + me.uid);
+const myName = () => me.name || me.email;
+function markOffline() {
+  if (!me) return Promise.resolve();
+  return set(myPres(), { name: myName(), online: false, lastSeen: rtTime() }).catch(() => {});
+}
+function startPresence() {
+  const stopConn = onValue(ref(rtdb, '.info/connected'), s => {
+    if (s.val() !== true) return;
+    onDisconnect(myPres()).set({ name: myName(), online: false, lastSeen: rtTime() })
+      .then(() => set(myPres(), { name: myName(), online: true, lastSeen: rtTime() }))
+      .catch(e => console.warn(e));
+  });
+  const stopList = onValue(ref(rtdb, 'presence'), s => { presence = s.val() || {}; renderPresence(); }, e => console.warn(e));
+  stops.push(stopConn, stopList);
+}
+function ago(ms) {
+  const m = Math.round((Date.now() - ms) / 60000);
+  if (m < 1) return 'przed chwilą';
+  if (m < 60) return m + ' min temu';
+  const h = Math.round(m / 60);
+  return h < 24 ? h + ' godz. temu' : Math.round(h / 24) + ' dn. temu';
+}
+function renderPresence() {
+  const all = Object.entries(presence).map(([uid, v]) => ({ uid, ...v }));
+  const on = all.filter(u => u.online).sort((a, b) => a.name.localeCompare(b.name, 'pl'));
+  const off = all.filter(u => !u.online).sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+  $('fabOn').textContent = $('onN').textContent = on.length;
+  const row = (u, isOn) => `<div class="pr ${isOn ? 'on' : ''}"><i></i>${esc(u.name)}${u.uid === me.uid ? ' (Ty)' : ''}${isOn ? '' : `<small>${u.lastSeen ? ago(u.lastSeen) : ''}</small>`}</div>`;
+  $('whoList').innerHTML = `<div class="pr-h">Teraz online (${on.length})</div>` + (on.map(u => row(u, true)).join('') || '<div class="empty">Nikt.</div>') +
+    (off.length ? `<div class="pr-h">Ostatnio aktywni</div>` + off.map(u => row(u, false)).join('') : '');
+}
+setInterval(() => { if (me && !$('chatPanel').hidden) renderPresence(); }, 30000);
+
+/* ---------- czat (Firestore) ---------- */
+function startChat() {
+  chatFirst = true; unread = 0; updBadge();
+  const q = query(collection(db, 'chat'), orderBy('createdAt', 'desc'), limit(100));
+  unsubChat = onSnapshot(q, snap => {
+    if (!chatFirst && !chatOpen) {
+      unread += snap.docChanges().filter(c => c.type === 'added' && c.doc.data().uid !== me.uid && !c.doc.metadata.hasPendingWrites).length;
+      updBadge();
+    }
+    chatFirst = false;
+    $('chatMsgs').innerHTML = snap.docs.reverse().map(d => {
+      const m = d.data(), mine = m.uid === me.uid;
+      const t = m.createdAt?.toDate?.().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) || '…';
+      return `<div class="cm ${mine ? 'me' : ''}"><small>${mine ? '' : esc(m.name) + ' · '}${t}</small><div class="b">${esc(m.text)}</div></div>`;
+    }).join('') || '<div class="empty">Brak wiadomości. Napisz pierwszą.</div>';
+    $('chatMsgs').scrollTop = $('chatMsgs').scrollHeight;
+  }, e => console.warn(e));
+}
+function updBadge() { $('fabUnread').hidden = unread < 1; $('fabUnread').textContent = unread > 9 ? '9+' : unread; }
+function stopRealtime() {
+  stops.forEach(f => f()); stops = [];
+  if (unsubChat) { unsubChat(); unsubChat = null; }
+  presence = {}; chatOpen = false; $('chatPanel').hidden = true;
+}
+function setChatTab(t) {
+  document.querySelectorAll('.ctabs button').forEach(b => b.classList.toggle('on', b.dataset.ct === t));
+  $('chatMsgs').hidden = $('chatForm').hidden = t !== 'chat';
+  $('whoList').hidden = t !== 'who';
+  if (t === 'who') renderPresence(); else $('chatMsgs').scrollTop = $('chatMsgs').scrollHeight;
+}
+$('chatFab').onclick = () => {
+  chatOpen = $('chatPanel').hidden;
+  $('chatPanel').hidden = !chatOpen;
+  if (chatOpen) { unread = 0; updBadge(); setChatTab('chat'); if (isDesk()) $('chatInput').focus(); }
+};
+$('chatClose').onclick = () => { chatOpen = false; $('chatPanel').hidden = true; };
+document.querySelector('.ctabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setChatTab(b.dataset.ct); });
+$('chatForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const text = $('chatInput').value.trim(); if (!text) return;
+  $('chatInput').value = '';
+  try { await addDoc(collection(db, 'chat'), { text, uid: me.uid, name: myName(), createdAt: serverTimestamp() }); }
+  catch { $('chatInput').value = text; alert('Nie udało się wysłać wiadomości.'); }
 });
