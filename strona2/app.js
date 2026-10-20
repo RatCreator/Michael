@@ -338,3 +338,16 @@ $('chatForm').addEventListener('submit', async e => {
   try { await addDoc(collection(db, 'chat'), { text, uid: me.uid, name: myName(), createdAt: serverTimestamp() }); }
   catch { $('chatInput').value = text; alert('Nie udało się wysłać wiadomości.'); }
 });
+
+/* ---------- telefon: czat dopasowany do klawiatury ---------- */
+if (window.visualViewport) {
+  const setVV = () => {
+    const v = window.visualViewport, st = document.documentElement.style;
+    st.setProperty('--vvh', v.height + 'px');
+    st.setProperty('--vvt', v.offsetTop + 'px');
+    if (chatOpen) $('chatMsgs').scrollTop = $('chatMsgs').scrollHeight;
+  };
+  window.visualViewport.addEventListener('resize', setVV);
+  window.visualViewport.addEventListener('scroll', setVV);
+  setVV();
+}
