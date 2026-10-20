@@ -197,3 +197,7 @@ button,.drop,.tag,.seg button{touch-action:manipulation}
   .cform{padding:10px 10px calc(10px + env(safe-area-inset-bottom))}
   .cform .btn{min-height:46px}
 }
+
+.chat-act{display:flex;align-items:center;gap:10px}
+.chat-act #chatClear{color:#f0a396;font-size:.85rem}
+.cnote{padding:6px 12px;font-size:.74rem;color:var(--soft);background:var(--bg);border-bottom:1px solid var(--line);text-align:center}
