@@ -1,0 +1,2242 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#152a3e">
+<title>Plan czytania Pisma Świętego</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Plan Czytania">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --card:#f7f8fa;
+    --card-border:#e4e7eb;
+    --ink:#20242b;
+    --ink-soft:#5b6270;
+    --navy:#1f3b57;
+    --navy-dark:#152a3e;
+    --gold:#b8862b;
+    --gold-soft:#f2e6cd;
+    --green:#3f7355;
+    --green-soft:#e4efe8;
+    --rust:#a85b2e;
+    --rust-soft:#f3e6dd;
+    --radius:14px;
+    --surface:#ffffff;
+    --page-bg:#eef1f4;
+    --header-bg:rgba(255,255,255,0.92);
+    --heading:var(--navy-dark);
+    --track:#e9ebee;
+    color-scheme:light;
+  }
+  html.theme-dark{
+    --bg:#0f151b;
+    --card:#1a2129;
+    --card-border:#2b3540;
+    --ink:#e8ecf1;
+    --ink-soft:#9aa7b6;
+    --navy:#5c93bb;
+    --navy-dark:#17293c;
+    --gold:#dcae5f;
+    --gold-soft:#3a2f1a;
+    --green:#72bd94;
+    --green-soft:#17281f;
+    --rust:#e0916a;
+    --rust-soft:#33201a;
+    --surface:#1a2129;
+    --page-bg:#0a0e12;
+    --header-bg:rgba(15,21,27,0.92);
+    --heading:#f5f8fb;
+    --track:#2b3540;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:48px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 8px;}
+  header.top{
+    border-bottom:2px solid var(--navy);
+    margin-bottom:20px;
+  }
+  .header-inner{
+    max-width:820px;
+    margin:0 auto;
+    padding:20px 16px 14px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+  }
+  header.top h1{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    font-size:1.5rem;
+    color:var(--heading);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header.top .sub{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .site-nav{display:none;}
+  .page-heading{display:none;}
+
+  /* ============= "Czytaj ST / Czytaj NT" buttons below the reading card ============= */
+  .read-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .read-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+    text-align:left;
+    font-family:'Inter',sans-serif;
+    transition:transform .1s ease, border-color .15s ease, box-shadow .15s ease;
+    box-shadow:0 1px 2px rgba(20,30,45,0.05);
+  }
+  .read-btn:active{transform:scale(0.97);}
+  .read-btn:hover{border-color:var(--gold);box-shadow:0 3px 10px rgba(184,134,43,0.16);}
+  .read-btn-icon{
+    flex:none;
+    font-size:1.25rem;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    background:var(--gold-soft);
+  }
+  .read-nt .read-btn-icon{background:var(--green-soft);}
+  .read-btn-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    min-width:0;
+    flex:1;
+  }
+  .read-btn-label{
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--heading);
+  }
+  .read-btn-ref{
+    font-size:0.76rem;
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .read-btn-arrow{
+    flex:none;
+    font-size:1.3rem;
+    color:var(--gold);
+  }
+  .read-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .read-btn:disabled:hover{border-color:var(--card-border);box-shadow:0 1px 2px rgba(20,30,45,0.05);}
+
+  /* dashboard */
+  .dash{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    margin-bottom:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .dash:before{
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:5px; height:100%;
+    background:var(--gold);
+  }
+  .dash-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .stat .num{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    font-size:1.5rem;
+    color:var(--heading);
+    display:block;
+    line-height:1.1;
+  }
+  .stat .lbl{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .progress-track{
+    background:var(--track);
+    border-radius:99px;
+    height:10px;
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--gold),#d4ab55);
+    border-radius:99px;
+    transition:width .4s ease;
+  }
+  .dash-foot{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 18px;
+    font-size:0.85rem;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .pace-tag{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:99px;
+    font-size:0.75rem;
+    font-weight:600;
+  }
+  .pace-ahead{background:var(--green-soft);color:var(--green);}
+  .pace-behind{background:var(--rust-soft);color:var(--rust);}
+  .pace-ontime{background:var(--gold-soft);color:var(--gold);}
+  .end-date{font-weight:600;color:var(--heading);}
+  .settings-row{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--card-border);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+  .settings-row input[type=date]{
+    font-family:inherit;
+    font-size:0.85rem;
+    padding:4px 6px;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .settings-row select{
+    font-family:inherit;
+    font-size:0.85rem;
+    padding:6px 8px;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .settings-row label{color:var(--ink-soft);}
+
+  /* current card */
+  .current-card{
+    background:var(--navy-dark);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:20px;
+    position:relative;
+  }
+  .current-card .tag{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#c9d4de;
+    margin-bottom:6px;
+  }
+  .current-card h2{
+    font-family:'Source Serif 4',serif;
+    margin:0 0 12px;
+    font-size:1.3rem;
+    font-weight:600;
+  }
+  .reading-lines{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .reading-line{
+    display:flex;
+    gap:8px;
+    align-items:baseline;
+    font-size:1.02rem;
+  }
+  .reading-line .k{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:#e8d3a0;
+    width:34px;
+    flex:none;
+  }
+  .btn-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  button{
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:0.88rem;
+    font-weight:600;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  button:active{transform:scale(0.97);}
+  .btn-primary{background:var(--gold);color:#2a1f0a;}
+  .btn-secondary{background:rgba(255,255,255,0.14);color:#fff;}
+  .btn-skip{background:transparent;color:#c9d4de;border:1px solid rgba(255,255,255,0.3);}
+  .all-done-msg{
+    font-family:'Source Serif 4',serif;
+    font-size:1.15rem;
+    text-align:center;
+    padding:10px 0 4px;
+  }
+
+  /* utility bar */
+  .util-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .util-bar button{
+    background:var(--surface);
+    color:var(--heading);
+    border:1px solid var(--card-border);
+    font-size:0.78rem;
+    padding:8px 12px;
+  }
+  .util-bar button:hover{border-color:var(--navy);}
+
+  /* month accordion */
+  details.month{
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    margin-bottom:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  details.month[open]{border-color:var(--navy);}
+  summary.month-head{
+    list-style:none;
+    cursor:pointer;
+    padding:13px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    font-size:1.02rem;
+    color:var(--heading);
+    background:var(--card);
+  }
+  summary.month-head::-webkit-details-marker{display:none;}
+  summary.month-head .marker{
+    font-family:'Inter',sans-serif;
+    font-size:0.9rem;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  summary.month-head .arrow{
+    display:inline-block;
+    margin-right:8px;
+    transition:transform .15s ease;
+    color:var(--gold);
+  }
+  details[open] summary.month-head .arrow{transform:rotate(90deg);}
+
+  .day-row{
+    display:grid;
+    grid-template-columns:38px 1fr 1fr 90px;
+    gap:10px;
+    align-items:center;
+    padding:10px 16px;
+    border-top:1px solid var(--card-border);
+    font-size:0.86rem;
+  }
+  .day-row.is-done{background:var(--green-soft);}
+  .day-row.is-skipped{background:var(--rust-soft);}
+  .day-row.is-current{background:var(--gold-soft);}
+  .day-num{
+    font-weight:700;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .day-row.is-done .day-num,.day-row.is-done .day-text{color:var(--green);}
+  .day-row.is-skipped .day-num,.day-row.is-skipped .day-text{color:var(--rust);}
+  .day-text{color:var(--ink);}
+  .day-row.is-done .day-text{text-decoration:line-through;text-decoration-color:rgba(63,115,85,0.45);}
+  .status-btn{
+    justify-self:end;
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    color:var(--ink-soft);
+    font-size:0.72rem;
+    padding:6px 8px;
+    border-radius:8px;
+    white-space:nowrap;
+  }
+  .day-row.is-done .status-btn{background:var(--green);color:#fff;border-color:var(--green);}
+  .day-row.is-skipped .status-btn{background:var(--rust);color:#fff;border-color:var(--rust);}
+
+  footer{
+    padding:24px 0 0;
+    border-top:1px dashed var(--card-border);
+    margin-top:8px;
+  }
+  .footer-util{
+    justify-content:center;
+    margin-bottom:0;
+  }
+  .footer-util button{
+    font-size:0.76rem;
+    opacity:0.85;
+  }
+  .footer-util button:hover{opacity:1;}
+
+  @media (max-width:560px){
+    .dash-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+    .stat .num{font-size:1.2rem;}
+    .day-row{
+      grid-template-columns:28px 1fr 78px;
+      grid-template-areas:
+        "num ot status"
+        "num nt status";
+      row-gap:2px;
+    }
+    .day-num{grid-area:num;}
+    .day-text.ot{grid-area:ot;}
+    .day-text.nt{grid-area:nt;}
+    .status-btn{grid-area:status;}
+    header.top{flex-direction:column;align-items:flex-start;gap:2px;}
+  }
+
+  button:disabled{opacity:0.4;cursor:not-allowed;}
+  button:disabled:active{transform:none;}
+  .marked-note{
+    font-size:0.78rem;
+    color:#c9d4de;
+    margin-top:10px;
+  }
+  .sync-status{
+    font-size:0.75rem;
+    padding:2px 8px;
+    border-radius:99px;
+    margin-left:auto;
+  }
+  .sync-off{color:var(--ink-soft);background:transparent;}
+  .sync-mid{color:var(--gold);background:var(--gold-soft);}
+  .sync-ok{color:var(--green);background:var(--green-soft);}
+  .sync-warn{color:var(--rust);background:var(--rust-soft);}
+
+  /* password lock */
+  .lock-overlay{
+    position:fixed;
+    inset:0;
+    background:var(--navy-dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:9999;
+    padding:20px;
+  }
+  .lock-box{
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    padding:32px 28px;
+    max-width:360px;
+    width:100%;
+    text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+  }
+  .lock-icon{font-size:2.2rem;margin-bottom:8px;}
+  .lock-box h2{
+    font-family:'Source Serif 4',serif;
+    color:var(--heading);
+    margin:0 0 6px;
+    font-size:1.2rem;
+  }
+  .lock-box p{color:var(--ink-soft);font-size:0.88rem;margin:0 0 18px;}
+  #lockForm{display:flex;flex-direction:column;gap:10px;}
+  #lockInput{
+    font-family:inherit;
+    font-size:1rem;
+    padding:10px 12px;
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    text-align:center;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  #lockForm button{width:100%;}
+  .lock-error{color:var(--rust);font-size:0.82rem;margin-top:12px;}
+
+  dialog{
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:0;
+    max-width:420px;
+    width:90%;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  dialog::backdrop{background:rgba(20,30,40,0.5);}
+  .dialog-body{padding:20px;}
+  .dialog-body h3{font-family:'Source Serif 4',serif;margin-top:0;}
+  .dialog-body textarea{
+    width:100%;
+    min-height:110px;
+    font-family:monospace;
+    font-size:0.78rem;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    padding:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+  .dialog-actions button.close-btn{background:var(--card);color:var(--ink);}
+
+  /* ===================== CZYTNIK: ramka z tekstem rozdziału (tekst z pliku biblia.js) ===================== */
+  .inline-reader{
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(20,30,45,0.05);
+  }
+  .inline-reader .reader-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    background:var(--navy-dark);
+    color:#fff;
+  }
+  .inline-reader .reader-title{
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    font-size:0.92rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .inline-reader .reader-head-actions{flex:none;display:flex;align-items:center;gap:6px;}
+  .inline-reader .reader-head-actions a,
+  .inline-reader .reader-head-actions button{
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:0.8rem;
+    font-family:inherit;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  .inline-reader .reader-head-actions a:hover,
+  .inline-reader .reader-head-actions button:hover{background:rgba(255,255,255,0.22);}
+  .inline-reader .back-btn{display:none;background:rgba(255,255,255,0.18) !important;}
+  .inline-reader .reader-body{
+    position:relative;
+    height:60vh;
+    min-height:360px;
+    max-height:640px;
+    background:var(--surface);
+  }
+  .reader-text{
+    position:absolute;
+    inset:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:16px 18px 22px;
+    font-family:'Source Serif 4',Georgia,serif;
+    font-size:1.04rem;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .reader-hint{color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:0.9rem;text-align:center;padding:24px 8px;margin:0;}
+  .reader-note{font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--rust);background:var(--rust-soft);border-radius:8px;padding:8px 10px;margin:0 0 12px;}
+  .verse-seg + .verse-seg{margin-top:22px;padding-top:16px;border-top:1px solid var(--card-border);}
+  .verse-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-family:'Source Serif 4',serif;font-size:1.06rem;font-weight:600;color:var(--heading);}
+  .verse-actions{display:flex;gap:6px;}
+  .mini{background:var(--card);color:var(--heading);border:1px solid var(--card-border);font-size:0.74rem;padding:4px 10px;border-radius:8px;}
+  .mini:hover{border-color:var(--navy);}
+  .verse{margin:0 0 0.4em;}
+  .verse sup{font-family:'Inter',sans-serif;font-size:0.62em;font-weight:700;color:var(--gold);margin-right:0.35em;}
+  .verse.hl{background:var(--gold-soft);border-radius:4px;padding:0 4px;margin-left:-4px;}
+  .source-note{font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--ink-soft);margin:22px 0 0;line-height:1.4;}
+  [hidden]{display:none !important;}
+
+  /* podzakładki strony „Biblia” */
+  .sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  .sub-tab{background:var(--surface);color:var(--ink-soft);border:1px solid var(--card-border);font-size:0.85rem;padding:9px 14px;border-radius:99px;}
+  .sub-tab.active{background:var(--navy-dark);color:#fff;border-color:var(--navy-dark);}
+  .quote-card{padding:24px 24px 22px 26px;}
+  .quote-text{margin:0;font-family:'Source Serif 4',serif;font-size:1.35rem;line-height:1.55;color:var(--ink);}
+  .quote-cite{display:block;margin-top:14px;font-style:normal;font-weight:700;font-size:0.95rem;color:var(--gold);}
+  .sigla-input{width:100%;font-family:inherit;font-size:1.05rem;padding:12px 14px;border:1px solid var(--card-border);border-radius:10px;background:var(--surface);color:var(--ink);}
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+  .chip{background:var(--card);border:1px solid var(--card-border);color:var(--ink-soft);border-radius:99px;padding:4px 11px;font-size:0.78rem;font-weight:500;}
+  .chip:hover{border-color:var(--gold);color:var(--heading);}
+  .sigla-err{color:var(--rust);font-size:0.88rem;margin:6px 0;}
+  .result-card{background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px 20px;font-family:'Source Serif 4',Georgia,serif;font-size:1.04rem;line-height:1.65;margin-bottom:16px;}
+  .bible-hint{font-size:0.78rem;color:var(--ink-soft);margin:0 0 10px;}
+
+  /* ---- "Powiększ": ramka rozwija się prawie na cały ekran (desktop) / na cały ekran jak osobny widok (telefon) ---- */
+  .reader-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,25,35,0.55);
+    z-index:998;
+    display:none;
+  }
+  .reader-backdrop.show{display:block;}
+  .inline-reader.is-fullscreen{
+    position:fixed;
+    z-index:999;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 24px 70px rgba(10,15,25,0.45);
+  }
+  .inline-reader.is-fullscreen .reader-body{
+    flex:1;
+    height:auto;
+    max-height:none;
+  }
+  @media (min-width:701px){
+    .inline-reader.is-fullscreen{
+      top:3vh; left:4vw; right:4vw; bottom:3vh;
+      border-radius:16px;
+      overflow:hidden;
+    }
+  }
+  @media (max-width:700px){
+    .inline-reader.is-fullscreen{
+      inset:0;
+      border-radius:0;
+    }
+  }
+  body.reader-fullscreen-lock{overflow:hidden;}
+  .inline-reader.is-fullscreen .expand-btn{display:none;}
+  .inline-reader.is-fullscreen .back-btn{display:inline-flex;}
+
+  /* ===================== SYNCHRONIZACJA: przycisk ręcznej synchronizacji ===================== */
+  #syncBtn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  #syncBtn.is-syncing{opacity:0.7;cursor:wait;}
+  #syncBtn .sync-spin{display:inline-block;animation:reader-spin 0.8s linear infinite;}
+
+  /* ===================== APP-LIKE MOBILE LAYOUT ===================== */
+  .tabbar{display:none;}
+  .app-page{scroll-snap-align:none;}
+
+  @media (max-width:700px){
+    html,body{height:100%;}
+    body{
+      overflow:hidden;
+      height:100dvh;
+      height:100vh;
+      padding-bottom:0;
+    }
+    #appContent{
+      display:flex;
+      flex-direction:column;
+      height:100dvh;
+      height:100vh;
+    }
+    header.top{
+      flex:0 0 auto;
+      margin-bottom:0;
+      border-bottom:1px solid var(--card-border);
+    }
+    .header-inner{
+      padding:14px 16px 12px;
+    }
+    .read-buttons{
+      margin-top:-8px;
+    }
+    .pages-scroller{
+      flex:1 1 auto;
+      min-height:0;
+      display:flex;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .pages-scroller::-webkit-scrollbar{display:none;}
+    .app-page{
+      flex:0 0 100%;
+      max-width:100%;
+      width:100%;
+      height:100%;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-align:start;
+      scroll-snap-stop:always;
+    }
+    .app-page .wrap{
+      max-width:none;
+      padding:16px 16px 28px;
+    }
+    .app-page footer{
+      border-top:none;
+      margin-top:0;
+      padding-top:0;
+    }
+    .tabbar{
+      display:flex;
+      flex:0 0 auto;
+      border-top:1px solid var(--card-border);
+      background:var(--surface);
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+    .tab-btn{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      padding:8px 4px 7px;
+      background:none;
+      border:none;
+      color:var(--ink-soft);
+      font-size:0.66rem;
+      font-weight:600;
+      border-radius:0;
+    }
+    .tab-btn:active{transform:none;opacity:0.7;}
+    .tab-btn .icon{font-size:1.2rem;line-height:1;}
+    .tab-btn.active{color:var(--heading);}
+    .tab-btn.active .icon{transform:scale(1.08);}
+  }
+
+  /* ===================== DESKTOP / LAPTOP WEBSITE LAYOUT ===================== */
+  @media (min-width:701px){
+    :root{ --page-x: 40px; --page-max: 1120px; }
+
+    body{ background:var(--page-bg); }
+
+    header.top{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:var(--header-bg);
+      backdrop-filter:saturate(180%) blur(8px);
+      -webkit-backdrop-filter:saturate(180%) blur(8px);
+      border-bottom:1px solid var(--card-border);
+      margin-bottom:0;
+    }
+    .header-inner{
+      max-width:var(--page-max);
+      padding:14px var(--page-x);
+      align-items:center;
+    }
+    header.top h1{ font-size:1.2rem; }
+    header.top .sub{ display:none; }
+
+    .site-nav{
+      display:flex;
+      gap:2px;
+      background:var(--card);
+      padding:4px;
+      border-radius:12px;
+    }
+    .nav-link{
+      position:relative;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-family:'Inter',sans-serif;
+      font-weight:600;
+      font-size:0.86rem;
+      color:var(--ink-soft);
+      padding:8px 16px;
+      border-radius:9px;
+      transition:color .15s ease, background .15s ease;
+    }
+    .nav-link:hover{ color:var(--heading); }
+    .nav-link.active{
+      color:#fff;
+      background:var(--navy-dark);
+    }
+
+    /* body content: only one "page" visible at a time, styled like a normal site page */
+    .pages-scroller{
+      display:block;
+    }
+    .app-page{
+      display:none;
+      height:auto;
+      overflow:visible;
+    }
+    .app-page.is-active{
+      display:block;
+    }
+    .app-page .wrap{
+      max-width:var(--page-max);
+      margin:0 auto;
+      padding:44px var(--page-x) 80px;
+    }
+
+    /* page heading shown above each section's content, like a normal website */
+    .page-heading{
+      display:block;
+      font-family:'Source Serif 4',serif;
+      font-weight:700;
+      font-size:1.7rem;
+      color:var(--heading);
+      margin:0 0 22px;
+      letter-spacing:-0.01em;
+    }
+
+    /* nicer card polish for a "real website" feel */
+    .dash, .current-card, details.month, .util-bar button, footer{
+      box-shadow:0 1px 3px rgba(20,30,45,0.06);
+    }
+    .dash{ padding:26px 28px 22px; }
+    .current-card{ padding:28px 30px; }
+    .current-card h2{ font-size:1.5rem; }
+
+    .read-buttons{
+      grid-template-columns:1fr 1fr;
+      max-width:640px;
+      gap:14px;
+    }
+    .read-btn{ padding:18px 18px; border-radius:14px; }
+    .read-btn-icon{ width:44px; height:44px; font-size:1.4rem; }
+    .read-btn-label{ font-size:0.88rem; }
+    .read-btn-ref{ font-size:0.82rem; }
+
+    .dash-grid{
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      max-width:520px;
+    }
+
+    #monthsWrap{ max-width:820px; }
+
+    footer{
+      border-top:none;
+      background:var(--surface);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:18px 20px;
+      margin-top:8px;
+    }
+    .footer-util{ justify-content:flex-start; }
+  }
+</style>
+<script>
+  /* Wczesne ustawienie motywu (przed narysowaniem strony), żeby uniknąć "mignięcia" jasnym tłem */
+  (function(){
+    try{
+      if(localStorage.getItem('biblePlanTheme_v1') === 'dark'){
+        document.documentElement.classList.add('theme-dark');
+      }
+    }catch(e){}
+  })();
+</script>
+</head>
+<body>
+
+<div id="lockOverlay" class="lock-overlay">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <h2>Ten plan jest prywatny</h2>
+    <p>Podaj hasło, aby przejść dalej.</p>
+    <form id="lockForm" autocomplete="off">
+      <input type="password" id="lockInput" placeholder="Hasło" autocomplete="new-password" required>
+      <button type="submit" class="btn-primary">Wejdź</button>
+    </form>
+    <div id="lockError" class="lock-error" style="display:none;">Nieprawidłowe hasło, spróbuj ponownie.</div>
+  </div>
+</div>
+
+<div id="appContent" style="display:none;">
+
+  <header class="top">
+    <div class="header-inner">
+      <div class="brand">
+        <h1>📖 Plan czytania Pisma Świętego</h1>
+        <span class="sub" id="todayLabel"></span>
+      </div>
+      <nav class="site-nav" id="siteNav">
+        <button class="nav-link active" data-target="page-today" type="button">Dziś</button>
+        <button class="nav-link" data-target="page-progress" type="button">Postęp</button>
+        <button class="nav-link" data-target="page-plan" type="button">Plan</button>
+        <button class="nav-link" data-target="page-bible" type="button">Biblia</button>
+        <button class="nav-link" data-target="page-more" type="button">Więcej</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="pages-scroller" id="pagesScroller">
+
+    <section class="app-page" id="page-today">
+      <div class="wrap">
+        <h2 class="page-heading">Dziś</h2>
+        <section class="current-card" id="currentCard">
+          <!-- filled by JS -->
+        </section>
+        <div class="read-buttons" id="readButtons">
+          <!-- filled by JS -->
+        </div>
+        <section class="inline-reader" id="inlineReader">
+          <div class="reader-head">
+            <span class="reader-title" id="readerTitle">Wybierz „Stary Testament” lub „Nowy Testament” powyżej, aby zobaczyć tekst</span>
+            <span class="reader-head-actions">
+              <button class="expand-btn" id="readerExpandBtn" type="button">🔍 Powiększ</button>
+              <button class="back-btn" id="readerBackBtn" type="button">‹ POWRÓT</button>
+            </span>
+          </div>
+          <div class="reader-body">
+            <div class="reader-text" id="readerText"><p class="reader-hint">📖 Tekst rozdziału pojawi się tutaj.</p></div>
+          </div>
+        </section>
+        <div class="reader-backdrop" id="readerBackdrop"></div>
+      </div>
+    </section>
+
+    <section class="app-page" id="page-progress">
+      <div class="wrap">
+        <h2 class="page-heading">Twój postęp</h2>
+        <section class="dash">
+          <div class="dash-grid">
+            <div class="stat">
+              <span class="num" id="statDone">0</span>
+              <span class="lbl">Ukończone</span>
+            </div>
+            <div class="stat">
+              <span class="num" id="statRemaining">365</span>
+              <span class="lbl">Pozostało dni</span>
+            </div>
+            <div class="stat">
+              <span class="num" id="statPercent">0%</span>
+              <span class="lbl">Postęp</span>
+            </div>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="dash-foot">
+            <span id="paceTag" class="pace-tag pace-ontime">na czasie</span>
+            <span>Szacowany koniec: <span class="end-date" id="endDate">—</span></span>
+          </div>
+          <div class="settings-row">
+            <label for="startDateInput">Data rozpoczęcia planu:</label>
+            <input type="date" id="startDateInput">
+            <span id="nominalEndNote"></span>
+            <button id="syncBtn" type="button">🔄 Synchronizuj</button>
+            <span id="syncStatus" class="sync-status sync-off"></span>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="app-page" id="page-plan">
+      <div class="wrap">
+        <h2 class="page-heading">Plan czytania</h2>
+        <div class="util-bar">
+          <button id="expandAllBtn">Rozwiń wszystkie miesiące</button>
+          <button id="collapseAllBtn">Zwiń wszystkie miesiące</button>
+        </div>
+        <div id="monthsWrap"></div>
+      </div>
+    </section>
+
+    <section class="app-page" id="page-bible">
+      <div class="wrap">
+        <h2 class="page-heading">Biblia</h2>
+        <div class="sub-tabs" role="tablist">
+          <button class="sub-tab active" data-sub="bs-los" type="button">🎲 Wylosuj cytat</button>
+          <button class="sub-tab" data-sub="bs-czytaj" type="button">📖 Księgi i rozdziały</button>
+          <button class="sub-tab" data-sub="bs-sigla" type="button">🔎 Wpisz sigla</button>
+        </div>
+
+        <div class="bible-panel" id="bs-los">
+          <section class="dash">
+            <div class="settings-row" style="margin-top:0;padding-top:0;border-top:none;">
+              <label for="quoteScope">Losuj z:</label>
+              <select id="quoteScope">
+                <option value="all">Całej Biblii</option>
+                <option value="st">Starego Testamentu</option>
+                <option value="nt">Nowego Testamentu</option>
+              </select>
+              <button id="quoteBtn" type="button" class="btn-primary">🎲 Wylosuj cytat</button>
+            </div>
+          </section>
+          <section class="dash quote-card" id="quoteCard"><p class="reader-hint">Kliknij „Wylosuj cytat”, aby zobaczyć losowy werset.</p></section>
+          <div class="util-bar" id="quoteActions" hidden>
+            <button id="quoteCopyBtn" type="button">Kopiuj</button>
+            <button id="quoteContextBtn" type="button">Czytaj w kontekście →</button>
+          </div>
+        </div>
+
+        <div class="bible-panel" id="bs-czytaj" hidden>
+          <section class="dash">
+            <div class="settings-row" style="margin-top:0;padding-top:0;border-top:none;">
+              <label for="bibleBookSelect">Księga:</label>
+              <select id="bibleBookSelect"></select>
+              <label for="bibleChapterSelect">Rozdział:</label>
+              <select id="bibleChapterSelect"></select>
+            </div>
+          </section>
+          <p class="bible-hint">Strzałki ‹ › w nagłówku (lub ← → na klawiaturze) przechodzą do poprzedniego i następnego rozdziału.</p>
+          <section class="inline-reader" id="bibleInlineReader">
+            <div class="reader-head">
+              <span class="reader-title" id="bibleReaderTitle"></span>
+              <span class="reader-head-actions">
+                <button id="biblePrevBtn" type="button" aria-label="Poprzedni rozdział">‹</button>
+                <button id="bibleNextBtn" type="button" aria-label="Następny rozdział">›</button>
+                <button class="expand-btn" id="bibleReaderExpandBtn" type="button">🔍 Powiększ</button>
+                <button class="back-btn" id="bibleReaderBackBtn" type="button">‹ POWRÓT</button>
+              </span>
+            </div>
+            <div class="reader-body">
+              <div class="reader-text" id="bibleReaderText"></div>
+            </div>
+          </section>
+          <div class="reader-backdrop" id="bibleReaderBackdrop"></div>
+        </div>
+
+        <div class="bible-panel" id="bs-sigla" hidden>
+          <input type="text" class="sigla-input" id="siglaIn" placeholder="np. J 3,16 · Mt 5,3-12 · Flp 4,4-7.13 · Ps 23" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Sigla">
+          <div class="chip-row" id="siglaExamples"></div>
+          <div id="siglaErr"></div>
+          <div class="result-card" id="siglaOut" hidden></div>
+          <p class="bible-hint">Rozumiem zapis polski (J 3,16) i angielski (J 3:16), przedziały (1,1-2,4), pojedyncze wersety po kropce (4,4-7.13), kilka odnośników po średniku oraz pełne nazwy ksiąg.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-page" id="page-more">
+      <div class="wrap">
+        <h2 class="page-heading">Więcej</h2>
+        <div class="util-bar">
+          <button id="refreshBtn">🔄 Odśwież stronę</button>
+          <button id="themeToggleBtn">🌙 Ciemny motyw</button>
+        </div>
+        <footer>
+          <div class="util-bar footer-util">
+            <button id="exportBtn">⭳ Eksportuj postęp</button>
+            <button id="importBtn">⭱ Importuj postęp</button>
+            <button id="resetBtn">↺ Reset planu</button>
+          </div>
+        </footer>
+      </div>
+    </section>
+
+  </div>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="tab-btn active" data-target="page-today" type="button">
+      <span class="icon">🏠</span><span>Dziś</span>
+    </button>
+    <button class="tab-btn" data-target="page-progress" type="button">
+      <span class="icon">📊</span><span>Postęp</span>
+    </button>
+    <button class="tab-btn" data-target="page-plan" type="button">
+      <span class="icon">📅</span><span>Plan</span>
+    </button>
+    <button class="tab-btn" data-target="page-bible" type="button">
+      <span class="icon">📚</span><span>Biblia</span>
+    </button>
+    <button class="tab-btn" data-target="page-more" type="button">
+      <span class="icon">⚙️</span><span>Więcej</span>
+    </button>
+  </nav>
+
+<dialog id="importDialog">
+  <div class="dialog-body">
+    <h3>Importuj postęp</h3>
+    <p style="font-size:0.85rem;color:var(--ink-soft)">Wklej tutaj zawartość wyeksportowanego wcześniej pliku JSON.</p>
+    <textarea id="importText" placeholder='{"startDate":"2026-01-01","status":{"1":"done"}}'></textarea>
+    <div class="dialog-actions">
+      <button class="close-btn" id="importCancel">Anuluj</button>
+      <button class="btn-primary" id="importConfirm" style="background:var(--navy-dark);color:#fff;">Importuj</button>
+    </div>
+  </div>
+</dialog>
+</div>
+
+<script src="biblia.js" defer></script>
+<script type="module">
+/* ================= PASSWORD GATE ================= */
+// Hasło nie jest przechowywane w tym pliku ani jawnie, ani jako skrót.
+// Skrót SHA-256 hasła trzymany jest w bazie Firestore (dokument config/lock)
+// i pobierany stąd przy każdym wejściu na stronę.
+let PW_HASH = null;
+let passwordHashReady = null; // Promise - ustawiany po inicjalizacji Firebase
+const PW_SESSION_KEY = 'biblePlanUnlocked_v1';
+
+async function sha256Hex(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function unlockApp(){
+  document.getElementById('lockOverlay').style.display = 'none';
+  document.getElementById('appContent').style.display = '';
+  initAndRender();
+}
+
+function setLockMessage(msg){
+  const el = document.getElementById('lockError');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function setLockFormEnabled(enabled){
+  document.getElementById('lockInput').disabled = !enabled;
+  document.querySelector('#lockForm button').disabled = !enabled;
+}
+
+async function loadPasswordHash(){
+  setLockFormEnabled(false);
+  setLockMessage('Łączenie z bazą danych…');
+
+  if(!CLOUD_ENABLED || !db){
+    setLockMessage('Baza danych nie jest jeszcze skonfigurowana (uzupełnij firebaseConfig w pliku), więc nie ma skąd pobrać hasła.');
+    return;
+  }
+
+  try{
+    const lockRef = doc(db, 'config', 'lock');
+    const snap = await getDoc(lockRef);
+    if(snap.exists() && snap.data().hash){
+      PW_HASH = snap.data().hash;
+      setLockMessage('');
+      setLockFormEnabled(true);
+      document.getElementById('lockInput').focus();
+    } else {
+      setLockMessage('Nie znaleziono hasła w bazie. Utwórz dokument config/lock z polem "hash" w konsoli Firebase.');
+    }
+  }catch(e){
+    console.warn('Nie udało się pobrać hasła z bazy.', e);
+    setLockMessage('Nie udało się połączyć z bazą danych. Sprawdź internet i odśwież stronę.');
+  }
+}
+
+document.getElementById('lockForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  if(!PW_HASH) return;
+  const val = document.getElementById('lockInput').value;
+  let hash = '';
+  try{ hash = await sha256Hex(val); }catch(err){}
+  if(hash === PW_HASH){
+    sessionStorage.setItem(PW_SESSION_KEY, '1');
+    unlockApp();
+  } else {
+    setLockMessage('Nieprawidłowe hasło, spróbuj ponownie.');
+    document.getElementById('lockInput').value = '';
+    document.getElementById('lockInput').focus();
+  }
+});
+
+/* ================= DATA ================= */
+const PLAN = [{"d":1,"m":"Styczeń","dm":1,"ot":"Kpł 1-3","nt":"Mt 1"},{"d":2,"m":"Styczeń","dm":2,"ot":"Kpł 4-5","nt":"Mt 2"},{"d":3,"m":"Styczeń","dm":3,"ot":"Kpł 6-7","nt":"Mt 3"},{"d":4,"m":"Styczeń","dm":4,"ot":"Kpł 8-9","nt":"Mt 4"},{"d":5,"m":"Styczeń","dm":5,"ot":"Kpł 10-11","nt":"Mt 5"},{"d":6,"m":"Styczeń","dm":6,"ot":"Kpł 12-13","nt":"Mt 6"},{"d":7,"m":"Styczeń","dm":7,"ot":"Kpł 14-15","nt":"Mt 7"},{"d":8,"m":"Styczeń","dm":8,"ot":"Kpł 16-17","nt":"Mt 8"},{"d":9,"m":"Styczeń","dm":9,"ot":"Kpł 18-19","nt":"Mt 9"},{"d":10,"m":"Styczeń","dm":10,"ot":"Kpł 20-21","nt":"Mt 10"},{"d":11,"m":"Styczeń","dm":11,"ot":"Kpł 22-23","nt":"Mt 11"},{"d":12,"m":"Styczeń","dm":12,"ot":"Kpł 24-25","nt":"Mt 12"},{"d":13,"m":"Styczeń","dm":13,"ot":"Kpł 26-27","nt":"Mt 13"},{"d":14,"m":"Styczeń","dm":14,"ot":"Lb 1-2","nt":"Mt 14"},{"d":15,"m":"Styczeń","dm":15,"ot":"Lb 3-4","nt":"Mt 15"},{"d":16,"m":"Styczeń","dm":16,"ot":"Lb 5-6","nt":"Mt 16"},{"d":17,"m":"Styczeń","dm":17,"ot":"Lb 7-8","nt":"Mt 17"},{"d":18,"m":"Styczeń","dm":18,"ot":"Lb 9-10","nt":"Mt 18"},{"d":19,"m":"Styczeń","dm":19,"ot":"Lb 11-12","nt":"Mt 19"},{"d":20,"m":"Styczeń","dm":20,"ot":"Lb 13-14","nt":"Mt 20"},{"d":21,"m":"Styczeń","dm":21,"ot":"Lb 15-16","nt":"Mt 21"},{"d":22,"m":"Styczeń","dm":22,"ot":"Lb 17-18","nt":"Mt 22"},{"d":23,"m":"Styczeń","dm":23,"ot":"Lb 19-20","nt":"Mt 23"},{"d":24,"m":"Styczeń","dm":24,"ot":"Lb 21-22","nt":"Mt 24"},{"d":25,"m":"Styczeń","dm":25,"ot":"Lb 23-24","nt":"Mt 25"},{"d":26,"m":"Styczeń","dm":26,"ot":"Lb 25-26","nt":"Mt 26"},{"d":27,"m":"Styczeń","dm":27,"ot":"Lb 27-28","nt":"Mt 27"},{"d":28,"m":"Styczeń","dm":28,"ot":"Lb 29-30","nt":"Mt 28"},{"d":29,"m":"Styczeń","dm":29,"ot":"Lb 31-32","nt":"-"},{"d":30,"m":"Styczeń","dm":30,"ot":"Lb 33-34","nt":"-"},{"d":31,"m":"Styczeń","dm":31,"ot":"Lb 35-36","nt":"-"},{"d":32,"m":"Luty","dm":1,"ot":"Pwt 1-3","nt":"Mk 1"},{"d":33,"m":"Luty","dm":2,"ot":"Pwt 4-6","nt":"Mk 2"},{"d":34,"m":"Luty","dm":3,"ot":"Pwt 7-8","nt":"Mk 3"},{"d":35,"m":"Luty","dm":4,"ot":"Pwt 9-10","nt":"Mk 4"},{"d":36,"m":"Luty","dm":5,"ot":"Pwt 11-12","nt":"Mk 5"},{"d":37,"m":"Luty","dm":6,"ot":"Pwt 13-14","nt":"Mk 6"},{"d":38,"m":"Luty","dm":7,"ot":"Pwt 15-16","nt":"Mk 7"},{"d":39,"m":"Luty","dm":8,"ot":"Pwt 17-18","nt":"Mk 8"},{"d":40,"m":"Luty","dm":9,"ot":"Pwt 19-20","nt":"Mk 9"},{"d":41,"m":"Luty","dm":10,"ot":"Pwt 21-22","nt":"Mk 10"},{"d":42,"m":"Luty","dm":11,"ot":"Pwt 23-24","nt":"Mk 11"},{"d":43,"m":"Luty","dm":12,"ot":"Pwt 25-26","nt":"Mk 12"},{"d":44,"m":"Luty","dm":13,"ot":"Pwt 27-28","nt":"Mk 13"},{"d":45,"m":"Luty","dm":14,"ot":"Pwt 29-30","nt":"Mk 14"},{"d":46,"m":"Luty","dm":15,"ot":"Pwt 31-32","nt":"Mk 15"},{"d":47,"m":"Luty","dm":16,"ot":"Pwt 33-34","nt":"Mk 16"},{"d":48,"m":"Luty","dm":17,"ot":"Joz 1-2","nt":"-"},{"d":49,"m":"Luty","dm":18,"ot":"Joz 3-4","nt":"-"},{"d":50,"m":"Luty","dm":19,"ot":"Joz 5-6","nt":"-"},{"d":51,"m":"Luty","dm":20,"ot":"Joz 7-8","nt":"-"},{"d":52,"m":"Luty","dm":21,"ot":"Joz 9-10","nt":"-"},{"d":53,"m":"Luty","dm":22,"ot":"Joz 11-12","nt":"-"},{"d":54,"m":"Luty","dm":23,"ot":"Joz 13-14","nt":"-"},{"d":55,"m":"Luty","dm":24,"ot":"Joz 15-16","nt":"-"},{"d":56,"m":"Luty","dm":25,"ot":"Joz 17-18","nt":"-"},{"d":57,"m":"Luty","dm":26,"ot":"Joz 19-20","nt":"-"},{"d":58,"m":"Luty","dm":27,"ot":"Joz 21-22","nt":"-"},{"d":59,"m":"Luty","dm":28,"ot":"Joz 23-24","nt":"-"},{"d":60,"m":"Marzec","dm":1,"ot":"Sdz 1-2","nt":"Łk 1"},{"d":61,"m":"Marzec","dm":2,"ot":"Sdz 3-4","nt":"Łk 2"},{"d":62,"m":"Marzec","dm":3,"ot":"Sdz 5-6","nt":"Łk 3"},{"d":63,"m":"Marzec","dm":4,"ot":"Sdz 7-8","nt":"Łk 4"},{"d":64,"m":"Marzec","dm":5,"ot":"Sdz 9-10","nt":"Łk 5"},{"d":65,"m":"Marzec","dm":6,"ot":"Sdz 11-12","nt":"Łk 6"},{"d":66,"m":"Marzec","dm":7,"ot":"Sdz 13-14","nt":"Łk 7"},{"d":67,"m":"Marzec","dm":8,"ot":"Sdz 15-16","nt":"Łk 8"},{"d":68,"m":"Marzec","dm":9,"ot":"Sdz 17-18","nt":"Łk 9"},{"d":69,"m":"Marzec","dm":10,"ot":"Sdz 19-20","nt":"Łk 10"},{"d":70,"m":"Marzec","dm":11,"ot":"Sdz 21; Rt 1","nt":"Łk 11"},{"d":71,"m":"Marzec","dm":12,"ot":"Rt 2-3","nt":"Łk 12"},{"d":72,"m":"Marzec","dm":13,"ot":"Rt 4; 2 Sm 1","nt":"Łk 13"},{"d":73,"m":"Marzec","dm":14,"ot":"2 Sm 2-3","nt":"Łk 14"},{"d":74,"m":"Marzec","dm":15,"ot":"2 Sm 4-5","nt":"Łk 15"},{"d":75,"m":"Marzec","dm":16,"ot":"2 Sm 6-7","nt":"Łk 16"},{"d":76,"m":"Marzec","dm":17,"ot":"2 Sm 8-9","nt":"Łk 17"},{"d":77,"m":"Marzec","dm":18,"ot":"2 Sm 10-11","nt":"Łk 18"},{"d":78,"m":"Marzec","dm":19,"ot":"2 Sm 12","nt":"Łk 19"},{"d":79,"m":"Marzec","dm":20,"ot":"2 Sm 13","nt":"Łk 20"},{"d":80,"m":"Marzec","dm":21,"ot":"2 Sm 14","nt":"Łk 21"},{"d":81,"m":"Marzec","dm":22,"ot":"2 Sm 15","nt":"Łk 22"},{"d":82,"m":"Marzec","dm":23,"ot":"2 Sm 16","nt":"Łk 23"},{"d":83,"m":"Marzec","dm":24,"ot":"2 Sm 17","nt":"Łk 24"},{"d":84,"m":"Marzec","dm":25,"ot":"2 Sm 18","nt":"-"},{"d":85,"m":"Marzec","dm":26,"ot":"2 Sm 19","nt":"-"},{"d":86,"m":"Marzec","dm":27,"ot":"2 Sm 20","nt":"-"},{"d":87,"m":"Marzec","dm":28,"ot":"2 Sm 21","nt":"-"},{"d":88,"m":"Marzec","dm":29,"ot":"2 Sm 22","nt":"-"},{"d":89,"m":"Marzec","dm":30,"ot":"2 Sm 23","nt":"-"},{"d":90,"m":"Marzec","dm":31,"ot":"2 Sm 24","nt":"-"},{"d":91,"m":"Kwiecień","dm":1,"ot":"1 Krl 1-2","nt":"J 1"},{"d":92,"m":"Kwiecień","dm":2,"ot":"1 Krl 3-4","nt":"J 2"},{"d":93,"m":"Kwiecień","dm":3,"ot":"1 Krl 5-6","nt":"J 3"},{"d":94,"m":"Kwiecień","dm":4,"ot":"1 Krl 7-8","nt":"J 4"},{"d":95,"m":"Kwiecień","dm":5,"ot":"1 Krl 9-10","nt":"J 5"},{"d":96,"m":"Kwiecień","dm":6,"ot":"1 Krl 11-12","nt":"J 6"},{"d":97,"m":"Kwiecień","dm":7,"ot":"1 Krl 13-14","nt":"J 7"},{"d":98,"m":"Kwiecień","dm":8,"ot":"1 Krl 15-16","nt":"J 8"},{"d":99,"m":"Kwiecień","dm":9,"ot":"1 Krl 17-18","nt":"J 9"},{"d":100,"m":"Kwiecień","dm":10,"ot":"1 Krl 19-20","nt":"J 10"},{"d":101,"m":"Kwiecień","dm":11,"ot":"1 Krl 21-22","nt":"J 11"},{"d":102,"m":"Kwiecień","dm":12,"ot":"2 Krl 1-2","nt":"J 12"},{"d":103,"m":"Kwiecień","dm":13,"ot":"2 Krl 3-4","nt":"J 13"},{"d":104,"m":"Kwiecień","dm":14,"ot":"2 Krl 5-6","nt":"J 14"},{"d":105,"m":"Kwiecień","dm":15,"ot":"2 Krl 7-8","nt":"J 15"},{"d":106,"m":"Kwiecień","dm":16,"ot":"2 Krl 9-10","nt":"J 16"},{"d":107,"m":"Kwiecień","dm":17,"ot":"2 Krl 11-12","nt":"J 17"},{"d":108,"m":"Kwiecień","dm":18,"ot":"2 Krl 13","nt":"J 18"},{"d":109,"m":"Kwiecień","dm":19,"ot":"2 Krl 14","nt":"J 19"},{"d":110,"m":"Kwiecień","dm":20,"ot":"2 Krl 15","nt":"J 20"},{"d":111,"m":"Kwiecień","dm":21,"ot":"2 Krl 16","nt":"J 21"},{"d":112,"m":"Kwiecień","dm":22,"ot":"2 Krl 17","nt":"-"},{"d":113,"m":"Kwiecień","dm":23,"ot":"2 Krl 18","nt":"-"},{"d":114,"m":"Kwiecień","dm":24,"ot":"2 Krl 19","nt":"-"},{"d":115,"m":"Kwiecień","dm":25,"ot":"2 Krl 20","nt":"-"},{"d":116,"m":"Kwiecień","dm":26,"ot":"2 Krl 21","nt":"-"},{"d":117,"m":"Kwiecień","dm":27,"ot":"2 Krl 22","nt":"-"},{"d":118,"m":"Kwiecień","dm":28,"ot":"2 Krl 23","nt":"-"},{"d":119,"m":"Kwiecień","dm":29,"ot":"2 Krl 24","nt":"-"},{"d":120,"m":"Kwiecień","dm":30,"ot":"2 Krl 25","nt":"-"},{"d":121,"m":"Maj","dm":1,"ot":"1 Krn 1-4","nt":"Dz 1"},{"d":122,"m":"Maj","dm":2,"ot":"1 Krn 5-8","nt":"Dz 2"},{"d":123,"m":"Maj","dm":3,"ot":"1 Krn 9-12","nt":"Dz 3"},{"d":124,"m":"Maj","dm":4,"ot":"1 Krn 13-15","nt":"Dz 4"},{"d":125,"m":"Maj","dm":5,"ot":"1 Krn 16-18","nt":"Dz 5"},{"d":126,"m":"Maj","dm":6,"ot":"1 Krn 19-21","nt":"Dz 6"},{"d":127,"m":"Maj","dm":7,"ot":"1 Krn 22-24","nt":"Dz 7"},{"d":128,"m":"Maj","dm":8,"ot":"1 Krn 25-27","nt":"Dz 8"},{"d":129,"m":"Maj","dm":9,"ot":"1 Krn 28-29; 2 Krn 1","nt":"Dz 9"},{"d":130,"m":"Maj","dm":10,"ot":"2 Krn 2-4","nt":"Dz 10"},{"d":131,"m":"Maj","dm":11,"ot":"2 Krn 5-7","nt":"Dz 11"},{"d":132,"m":"Maj","dm":12,"ot":"2 Krn 8-10","nt":"Dz 12"},{"d":133,"m":"Maj","dm":13,"ot":"2 Krn 11-13","nt":"Dz 13"},{"d":134,"m":"Maj","dm":14,"ot":"2 Krn 14-16","nt":"Dz 14"},{"d":135,"m":"Maj","dm":15,"ot":"2 Krn 17-19","nt":"Dz 15"},{"d":136,"m":"Maj","dm":16,"ot":"2 Krn 20-22","nt":"Dz 16"},{"d":137,"m":"Maj","dm":17,"ot":"2 Krn 23-25","nt":"Dz 17"},{"d":138,"m":"Maj","dm":18,"ot":"2 Krn 26-28","nt":"Dz 18"},{"d":139,"m":"Maj","dm":19,"ot":"2 Krn 29-31","nt":"Dz 19"},{"d":140,"m":"Maj","dm":20,"ot":"2 Krn 32-34","nt":"Dz 20"},{"d":141,"m":"Maj","dm":21,"ot":"2 Krn 35-36; 1 Mch 1","nt":"Dz 21"},{"d":142,"m":"Maj","dm":22,"ot":"1 Mch 2-4","nt":"Dz 22"},{"d":143,"m":"Maj","dm":23,"ot":"1 Mch 5-7","nt":"Dz 23"},{"d":144,"m":"Maj","dm":24,"ot":"1 Mch 8-10","nt":"Dz 24"},{"d":145,"m":"Maj","dm":25,"ot":"1 Mch 11-13","nt":"Dz 25"},{"d":146,"m":"Maj","dm":26,"ot":"1 Mch 14-16","nt":"Dz 26"},{"d":147,"m":"Maj","dm":27,"ot":"2 Mch 1-3","nt":"Dz 27"},{"d":148,"m":"Maj","dm":28,"ot":"2 Mch 4-6","nt":"Dz 28"},{"d":149,"m":"Maj","dm":29,"ot":"2 Mch 7-9","nt":"-"},{"d":150,"m":"Maj","dm":30,"ot":"2 Mch 10-12","nt":"-"},{"d":151,"m":"Maj","dm":31,"ot":"2 Mch 13-15","nt":"-"},{"d":152,"m":"Czerwiec","dm":1,"ot":"Ezd 1-3","nt":"Rz 1-2"},{"d":153,"m":"Czerwiec","dm":2,"ot":"Ezd 4-6","nt":"Rz 3-4"},{"d":154,"m":"Czerwiec","dm":3,"ot":"Ezd 7-9","nt":"Rz 5"},{"d":155,"m":"Czerwiec","dm":4,"ot":"Ezd 10; Ne 1","nt":"Rz 6"},{"d":156,"m":"Czerwiec","dm":5,"ot":"Ne 2-3","nt":"Rz 7"},{"d":157,"m":"Czerwiec","dm":6,"ot":"Ne 4-5","nt":"Rz 8"},{"d":158,"m":"Czerwiec","dm":7,"ot":"Ne 6-7","nt":"Rz 9"},{"d":159,"m":"Czerwiec","dm":8,"ot":"Ne 8-9","nt":"Rz 10"},{"d":160,"m":"Czerwiec","dm":9,"ot":"Ne 10-11","nt":"Rz 11"},{"d":161,"m":"Czerwiec","dm":10,"ot":"Ne 12-13","nt":"Rz 12"},{"d":162,"m":"Czerwiec","dm":11,"ot":"Est 1-2","nt":"Rz 13"},{"d":163,"m":"Czerwiec","dm":12,"ot":"Est 3-4","nt":"Rz 14"},{"d":164,"m":"Czerwiec","dm":13,"ot":"Est 5-6","nt":"Rz 15"},{"d":165,"m":"Czerwiec","dm":14,"ot":"Est 7-8","nt":"Rz 16"},{"d":166,"m":"Czerwiec","dm":15,"ot":"Est 9-10","nt":"1 Kor 1"},{"d":167,"m":"Czerwiec","dm":16,"ot":"Tb 1-2","nt":"1 Kor 2"},{"d":168,"m":"Czerwiec","dm":17,"ot":"Tb 3-4","nt":"1 Kor 3"},{"d":169,"m":"Czerwiec","dm":18,"ot":"Tb 5-6","nt":"1 Kor 4"},{"d":170,"m":"Czerwiec","dm":19,"ot":"Tb 7-8","nt":"1 Kor 5"},{"d":171,"m":"Czerwiec","dm":20,"ot":"Tb 9-10","nt":"1 Kor 6"},{"d":172,"m":"Czerwiec","dm":21,"ot":"Tb 11-12","nt":"1 Kor 7"},{"d":173,"m":"Czerwiec","dm":22,"ot":"Tb 13-14","nt":"1 Kor 8"},{"d":174,"m":"Czerwiec","dm":23,"ot":"Jdt 1-2","nt":"1 Kor 9"},{"d":175,"m":"Czerwiec","dm":24,"ot":"Jdt 3-4","nt":"1 Kor 10"},{"d":176,"m":"Czerwiec","dm":25,"ot":"Jdt 5-6","nt":"1 Kor 11"},{"d":177,"m":"Czerwiec","dm":26,"ot":"Jdt 7-8","nt":"1 Kor 12"},{"d":178,"m":"Czerwiec","dm":27,"ot":"Jdt 9-10","nt":"1 Kor 13"},{"d":179,"m":"Czerwiec","dm":28,"ot":"Jdt 11-12","nt":"1 Kor 14"},{"d":180,"m":"Czerwiec","dm":29,"ot":"Jdt 13-14","nt":"1 Kor 15"},{"d":181,"m":"Czerwiec","dm":30,"ot":"Jdt 15-16","nt":"1 Kor 16"},{"d":182,"m":"Lipiec","dm":1,"ot":"Hi 1-4","nt":"2 Kor 1"},{"d":183,"m":"Lipiec","dm":2,"ot":"Hi 5-8","nt":"2 Kor 2"},{"d":184,"m":"Lipiec","dm":3,"ot":"Hi 9-12","nt":"2 Kor 3"},{"d":185,"m":"Lipiec","dm":4,"ot":"Hi 13-16","nt":"2 Kor 4"},{"d":186,"m":"Lipiec","dm":5,"ot":"Hi 17-20","nt":"2 Kor 5"},{"d":187,"m":"Lipiec","dm":6,"ot":"Hi 21-24","nt":"2 Kor 6"},{"d":188,"m":"Lipiec","dm":7,"ot":"Hi 25-28","nt":"2 Kor 7"},{"d":189,"m":"Lipiec","dm":8,"ot":"Hi 29-32","nt":"2 Kor 8"},{"d":190,"m":"Lipiec","dm":9,"ot":"Hi 33-36","nt":"2 Kor 9"},{"d":191,"m":"Lipiec","dm":10,"ot":"Hi 37-40","nt":"2 Kor 10"},{"d":192,"m":"Lipiec","dm":11,"ot":"Hi 41-42; Ps 1-2","nt":"2 Kor 11"},{"d":193,"m":"Lipiec","dm":12,"ot":"Ps 3-6","nt":"2 Kor 12"},{"d":194,"m":"Lipiec","dm":13,"ot":"Ps 7-10","nt":"2 Kor 13"},{"d":195,"m":"Lipiec","dm":14,"ot":"Ps 11-14","nt":"Ga 1"},{"d":196,"m":"Lipiec","dm":15,"ot":"Ps 15-18","nt":"Ga 2"},{"d":197,"m":"Lipiec","dm":16,"ot":"Ps 19-22","nt":"Ga 3"},{"d":198,"m":"Lipiec","dm":17,"ot":"Ps 23-26","nt":"Ga 4"},{"d":199,"m":"Lipiec","dm":18,"ot":"Ps 27-30","nt":"Ga 5"},{"d":200,"m":"Lipiec","dm":19,"ot":"Ps 31-34","nt":"Ga 6"},{"d":201,"m":"Lipiec","dm":20,"ot":"Ps 35-38","nt":"Ef 1"},{"d":202,"m":"Lipiec","dm":21,"ot":"Ps 39-42","nt":"Ef 2"},{"d":203,"m":"Lipiec","dm":22,"ot":"Ps 43-46","nt":"Ef 3"},{"d":204,"m":"Lipiec","dm":23,"ot":"Ps 47-50","nt":"Ef 4"},{"d":205,"m":"Lipiec","dm":24,"ot":"Ps 51-54","nt":"Ef 5"},{"d":206,"m":"Lipiec","dm":25,"ot":"Ps 55-57","nt":"Ef 6"},{"d":207,"m":"Lipiec","dm":26,"ot":"Ps 58-60","nt":"-"},{"d":208,"m":"Lipiec","dm":27,"ot":"Ps 61-63","nt":"-"},{"d":209,"m":"Lipiec","dm":28,"ot":"Ps 64-66","nt":"-"},{"d":210,"m":"Lipiec","dm":29,"ot":"Ps 67-69","nt":"-"},{"d":211,"m":"Lipiec","dm":30,"ot":"Ps 70-72","nt":"-"},{"d":212,"m":"Lipiec","dm":31,"ot":"Ps 73-75","nt":"-"},{"d":213,"m":"Sierpień","dm":1,"ot":"Ps 76-79","nt":"Flp 1"},{"d":214,"m":"Sierpień","dm":2,"ot":"Ps 80-83","nt":"Flp 2"},{"d":215,"m":"Sierpień","dm":3,"ot":"Ps 84-87","nt":"Flp 3"},{"d":216,"m":"Sierpień","dm":4,"ot":"Ps 88-91","nt":"Flp 4"},{"d":217,"m":"Sierpień","dm":5,"ot":"Ps 92-95","nt":"Kol 1"},{"d":218,"m":"Sierpień","dm":6,"ot":"Ps 96-99","nt":"Kol 2"},{"d":219,"m":"Sierpień","dm":7,"ot":"Ps 100-103","nt":"Kol 3"},{"d":220,"m":"Sierpień","dm":8,"ot":"Ps 104-107","nt":"Kol 4"},{"d":221,"m":"Sierpień","dm":9,"ot":"Ps 108-111","nt":"1 Tes 1"},{"d":222,"m":"Sierpień","dm":10,"ot":"Ps 112-115","nt":"1 Tes 2"},{"d":223,"m":"Sierpień","dm":11,"ot":"Ps 116-119","nt":"1 Tes 3"},{"d":224,"m":"Sierpień","dm":12,"ot":"Ps 120-123","nt":"1 Tes 4"},{"d":225,"m":"Sierpień","dm":13,"ot":"Ps 124-127","nt":"1 Tes 5"},{"d":226,"m":"Sierpień","dm":14,"ot":"Ps 128-130","nt":"2 Tes 1"},{"d":227,"m":"Sierpień","dm":15,"ot":"Ps 131-133","nt":"2 Tes 2"},{"d":228,"m":"Sierpień","dm":16,"ot":"Ps 134-136","nt":"2 Tes 3"},{"d":229,"m":"Sierpień","dm":17,"ot":"Ps 137-139","nt":"-"},{"d":230,"m":"Sierpień","dm":18,"ot":"Ps 140-142","nt":"-"},{"d":231,"m":"Sierpień","dm":19,"ot":"Ps 143-145","nt":"-"},{"d":232,"m":"Sierpień","dm":20,"ot":"Ps 146-148","nt":"-"},{"d":233,"m":"Sierpień","dm":21,"ot":"Ps 149-150; Prz 1","nt":"-"},{"d":234,"m":"Sierpień","dm":22,"ot":"Prz 2-4","nt":"-"},{"d":235,"m":"Sierpień","dm":23,"ot":"Prz 5-7","nt":"-"},{"d":236,"m":"Sierpień","dm":24,"ot":"Prz 8-10","nt":"-"},{"d":237,"m":"Sierpień","dm":25,"ot":"Prz 11-13","nt":"-"},{"d":238,"m":"Sierpień","dm":26,"ot":"Prz 14-16","nt":"-"},{"d":239,"m":"Sierpień","dm":27,"ot":"Prz 17-19","nt":"-"},{"d":240,"m":"Sierpień","dm":28,"ot":"Prz 20-22","nt":"-"},{"d":241,"m":"Sierpień","dm":29,"ot":"Prz 23-25","nt":"-"},{"d":242,"m":"Sierpień","dm":30,"ot":"Prz 26-28","nt":"-"},{"d":243,"m":"Sierpień","dm":31,"ot":"Prz 29-31","nt":"-"},{"d":244,"m":"Wrzesień","dm":1,"ot":"Koh 1-2","nt":"1 Tm 1"},{"d":245,"m":"Wrzesień","dm":2,"ot":"Koh 3-4","nt":"1 Tm 2"},{"d":246,"m":"Wrzesień","dm":3,"ot":"Koh 5-6","nt":"1 Tm 3"},{"d":247,"m":"Wrzesień","dm":4,"ot":"Koh 7-8","nt":"1 Tm 4"},{"d":248,"m":"Wrzesień","dm":5,"ot":"Koh 9-10","nt":"1 Tm 5"},{"d":249,"m":"Wrzesień","dm":6,"ot":"Koh 11-12","nt":"1 Tm 6"},{"d":250,"m":"Wrzesień","dm":7,"ot":"Pnp 1-2","nt":"2 Tm 1"},{"d":251,"m":"Wrzesień","dm":8,"ot":"Pnp 3-4","nt":"2 Tm 2"},{"d":252,"m":"Wrzesień","dm":9,"ot":"Pnp 5-6","nt":"2 Tm 3"},{"d":253,"m":"Wrzesień","dm":10,"ot":"Pnp 7","nt":"2 Tm 4"},{"d":254,"m":"Wrzesień","dm":11,"ot":"Pnp 8","nt":"Tt 1"},{"d":255,"m":"Wrzesień","dm":12,"ot":"Mdr 1","nt":"Tt 2"},{"d":256,"m":"Wrzesień","dm":13,"ot":"Mdr 2","nt":"Tt 3"},{"d":257,"m":"Wrzesień","dm":14,"ot":"Mdr 3","nt":"Flm 1"},{"d":258,"m":"Wrzesień","dm":15,"ot":"Mdr 4","nt":"Hbr 1"},{"d":259,"m":"Wrzesień","dm":16,"ot":"Mdr 5","nt":"Hbr 2"},{"d":260,"m":"Wrzesień","dm":17,"ot":"Mdr 6","nt":"Hbr 3"},{"d":261,"m":"Wrzesień","dm":18,"ot":"Mdr 7","nt":"Hbr 4"},{"d":262,"m":"Wrzesień","dm":19,"ot":"Mdr 8","nt":"Hbr 5"},{"d":263,"m":"Wrzesień","dm":20,"ot":"Mdr 9","nt":"Hbr 6"},{"d":264,"m":"Wrzesień","dm":21,"ot":"Mdr 10","nt":"Hbr 7"},{"d":265,"m":"Wrzesień","dm":22,"ot":"Mdr 11","nt":"Hbr 8"},{"d":266,"m":"Wrzesień","dm":23,"ot":"Mdr 12","nt":"Hbr 9"},{"d":267,"m":"Wrzesień","dm":24,"ot":"Mdr 13","nt":"Hbr 10"},{"d":268,"m":"Wrzesień","dm":25,"ot":"Mdr 14","nt":"Hbr 11"},{"d":269,"m":"Wrzesień","dm":26,"ot":"Mdr 15","nt":"Hbr 12"},{"d":270,"m":"Wrzesień","dm":27,"ot":"Mdr 16","nt":"Hbr 13"},{"d":271,"m":"Wrzesień","dm":28,"ot":"Mdr 17","nt":"-"},{"d":272,"m":"Wrzesień","dm":29,"ot":"Mdr 18","nt":"-"},{"d":273,"m":"Wrzesień","dm":30,"ot":"Mdr 19","nt":"-"},{"d":274,"m":"Październik","dm":1,"ot":"Syr 1-2","nt":"Jk 1"},{"d":275,"m":"Październik","dm":2,"ot":"Syr 3-4","nt":"Jk 2"},{"d":276,"m":"Październik","dm":3,"ot":"Syr 5-6","nt":"Jk 3"},{"d":277,"m":"Październik","dm":4,"ot":"Syr 7-8","nt":"Jk 4"},{"d":278,"m":"Październik","dm":5,"ot":"Syr 9-10","nt":"Jk 5"},{"d":279,"m":"Październik","dm":6,"ot":"Syr 11-12","nt":"1 P 1"},{"d":280,"m":"Październik","dm":7,"ot":"Syr 13-14","nt":"1 P 2"},{"d":281,"m":"Październik","dm":8,"ot":"Syr 15-16","nt":"1 P 3"},{"d":282,"m":"Październik","dm":9,"ot":"Syr 17-18","nt":"1 P 4"},{"d":283,"m":"Październik","dm":10,"ot":"Syr 19-20","nt":"1 P 5"},{"d":284,"m":"Październik","dm":11,"ot":"Syr 21-22","nt":"2 P 1"},{"d":285,"m":"Październik","dm":12,"ot":"Syr 23-24","nt":"2 P 2"},{"d":286,"m":"Październik","dm":13,"ot":"Syr 25-26","nt":"2 P 3"},{"d":287,"m":"Październik","dm":14,"ot":"Syr 27-28","nt":"1 J 1"},{"d":288,"m":"Październik","dm":15,"ot":"Syr 29-30","nt":"1 J 2"},{"d":289,"m":"Październik","dm":16,"ot":"Syr 31-32","nt":"1 J 3"},{"d":290,"m":"Październik","dm":17,"ot":"Syr 33-34","nt":"1 J 4"},{"d":291,"m":"Październik","dm":18,"ot":"Syr 35-36","nt":"1 J 5"},{"d":292,"m":"Październik","dm":19,"ot":"Syr 37-38","nt":"2 J 1"},{"d":293,"m":"Październik","dm":20,"ot":"Syr 39-40","nt":"3 J 1"},{"d":294,"m":"Październik","dm":21,"ot":"Syr 41-42","nt":"Jud 1"},{"d":295,"m":"Październik","dm":22,"ot":"Syr 43-44","nt":"-"},{"d":296,"m":"Październik","dm":23,"ot":"Syr 45-46","nt":"-"},{"d":297,"m":"Październik","dm":24,"ot":"Syr 47-48","nt":"-"},{"d":298,"m":"Październik","dm":25,"ot":"Syr 49-50","nt":"-"},{"d":299,"m":"Październik","dm":26,"ot":"Syr 51; Ba 1","nt":"-"},{"d":300,"m":"Październik","dm":27,"ot":"Ba 2","nt":"-"},{"d":301,"m":"Październik","dm":28,"ot":"Ba 3","nt":"-"},{"d":302,"m":"Październik","dm":29,"ot":"Ba 4","nt":"-"},{"d":303,"m":"Październik","dm":30,"ot":"Ba 5","nt":"-"},{"d":304,"m":"Październik","dm":31,"ot":"Ba 6","nt":"-"},{"d":305,"m":"Listopad","dm":1,"ot":"Iz 1-5","nt":"Ap 1"},{"d":306,"m":"Listopad","dm":2,"ot":"Iz 6-10","nt":"Ap 2"},{"d":307,"m":"Listopad","dm":3,"ot":"Iz 11-15","nt":"Ap 3"},{"d":308,"m":"Listopad","dm":4,"ot":"Iz 16-19","nt":"Ap 4"},{"d":309,"m":"Listopad","dm":5,"ot":"Iz 20-23","nt":"Ap 5"},{"d":310,"m":"Listopad","dm":6,"ot":"Iz 24-27","nt":"Ap 6"},{"d":311,"m":"Listopad","dm":7,"ot":"Iz 28-31","nt":"Ap 7"},{"d":312,"m":"Listopad","dm":8,"ot":"Iz 32-35","nt":"Ap 8"},{"d":313,"m":"Listopad","dm":9,"ot":"Iz 36-39","nt":"Ap 9"},{"d":314,"m":"Listopad","dm":10,"ot":"Iz 40-43","nt":"Ap 10"},{"d":315,"m":"Listopad","dm":11,"ot":"Iz 44-47","nt":"Ap 11"},{"d":316,"m":"Listopad","dm":12,"ot":"Iz 48-51","nt":"Ap 12"},{"d":317,"m":"Listopad","dm":13,"ot":"Iz 52-55","nt":"Ap 13"},{"d":318,"m":"Listopad","dm":14,"ot":"Iz 56-59","nt":"Ap 14"},{"d":319,"m":"Listopad","dm":15,"ot":"Iz 60-63","nt":"Ap 15"},{"d":320,"m":"Listopad","dm":16,"ot":"Iz 64-66; Jr 1","nt":"Ap 16"},{"d":321,"m":"Listopad","dm":17,"ot":"Jr 2-5","nt":"Ap 17"},{"d":322,"m":"Listopad","dm":18,"ot":"Jr 6-9","nt":"Ap 18"},{"d":323,"m":"Listopad","dm":19,"ot":"Jr 10-13","nt":"Ap 19"},{"d":324,"m":"Listopad","dm":20,"ot":"Jr 14-17","nt":"Ap 20"},{"d":325,"m":"Listopad","dm":21,"ot":"Jr 18-21","nt":"Ap 21"},{"d":326,"m":"Listopad","dm":22,"ot":"Jr 22-25","nt":"Ap 22"},{"d":327,"m":"Listopad","dm":23,"ot":"Jr 26-29","nt":"-"},{"d":328,"m":"Listopad","dm":24,"ot":"Jr 30-33","nt":"-"},{"d":329,"m":"Listopad","dm":25,"ot":"Jr 34-37","nt":"-"},{"d":330,"m":"Listopad","dm":26,"ot":"Jr 38-41","nt":"-"},{"d":331,"m":"Listopad","dm":27,"ot":"Jr 42-45","nt":"-"},{"d":332,"m":"Listopad","dm":28,"ot":"Jr 46-49","nt":"-"},{"d":333,"m":"Listopad","dm":29,"ot":"Jr 50-52; Lm 1","nt":"-"},{"d":334,"m":"Listopad","dm":30,"ot":"Lm 2-5","nt":"-"},{"d":335,"m":"Grudzień","dm":1,"ot":"Ez 1-5","nt":"-"},{"d":336,"m":"Grudzień","dm":2,"ot":"Ez 6-10","nt":"-"},{"d":337,"m":"Grudzień","dm":3,"ot":"Ez 11-15","nt":"-"},{"d":338,"m":"Grudzień","dm":4,"ot":"Ez 16-20","nt":"-"},{"d":339,"m":"Grudzień","dm":5,"ot":"Ez 21-25","nt":"-"},{"d":340,"m":"Grudzień","dm":6,"ot":"Ez 26-29","nt":"-"},{"d":341,"m":"Grudzień","dm":7,"ot":"Ez 30-33","nt":"-"},{"d":342,"m":"Grudzień","dm":8,"ot":"Ez 34-37","nt":"-"},{"d":343,"m":"Grudzień","dm":9,"ot":"Ez 38-41","nt":"-"},{"d":344,"m":"Grudzień","dm":10,"ot":"Ez 42-45","nt":"-"},{"d":345,"m":"Grudzień","dm":11,"ot":"Ez 46-48; Dn 1","nt":"-"},{"d":346,"m":"Grudzień","dm":12,"ot":"Dn 2-5","nt":"-"},{"d":347,"m":"Grudzień","dm":13,"ot":"Dn 6-9","nt":"-"},{"d":348,"m":"Grudzień","dm":14,"ot":"Dn 10-13","nt":"-"},{"d":349,"m":"Grudzień","dm":15,"ot":"Dn 14; Oz 1-3","nt":"-"},{"d":350,"m":"Grudzień","dm":16,"ot":"Oz 4-7","nt":"-"},{"d":351,"m":"Grudzień","dm":17,"ot":"Oz 8-11","nt":"-"},{"d":352,"m":"Grudzień","dm":18,"ot":"Oz 12-14; Jl 1","nt":"-"},{"d":353,"m":"Grudzień","dm":19,"ot":"Jl 2-4; Am 1","nt":"-"},{"d":354,"m":"Grudzień","dm":20,"ot":"Am 2-5","nt":"-"},{"d":355,"m":"Grudzień","dm":21,"ot":"Am 6-9","nt":"-"},{"d":356,"m":"Grudzień","dm":22,"ot":"Ab 1; Jon 1-3","nt":"-"},{"d":357,"m":"Grudzień","dm":23,"ot":"Jon 4; Mi 1-3","nt":"-"},{"d":358,"m":"Grudzień","dm":24,"ot":"Mi 4-7","nt":"-"},{"d":359,"m":"Grudzień","dm":25,"ot":"Na 1-3; Ha 1","nt":"-"},{"d":360,"m":"Grudzień","dm":26,"ot":"Ha 2-3; So 1-2","nt":"-"},{"d":361,"m":"Grudzień","dm":27,"ot":"So 3; Ag 1-2; Za 1","nt":"-"},{"d":362,"m":"Grudzień","dm":28,"ot":"Za 2-5","nt":"-"},{"d":363,"m":"Grudzień","dm":29,"ot":"Za 6-9","nt":"-"},{"d":364,"m":"Grudzień","dm":30,"ot":"Za 10-13","nt":"-"},{"d":365,"m":"Grudzień","dm":31,"ot":"Za 14; Ml 1-3","nt":"-"}];
+const TOTAL = PLAN.length;
+const STORAGE_KEY = 'biblePlanProgress_v1';
+
+/* ================= CLOUD SYNC (Firebase Firestore) =================
+   Ta strona jest statyczna (GitHub Pages), więc żeby postęp zapisywał się
+   automatycznie "w chmurze" i był widoczny na każdym urządzeniu, korzystamy
+   z darmowej bazy Firebase Firestore.
+
+   JAK URUCHOMIĆ (jednorazowo):
+   1. Wejdź na https://console.firebase.google.com i załóż darmowy projekt.
+   2. W panelu projektu: Build > Firestore Database > "Create database"
+      (wybierz tryb "Start in production mode").
+   3. W zakładce Rules skasuj całą dotychczasową zawartość i wklej dokładnie
+      poniższe reguły, po czym kliknij "Publish":
+
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+
+            match /config/lock {
+              allow read: if true;
+              allow write: if false;
+            }
+
+            match /biblePlan/progress {
+              allow read: if true;
+              allow write: if request.resource.data.pwHash ==
+                get(/databases/$(database)/documents/config/lock).data.hash;
+            }
+
+          }
+        }
+
+      (Dokument config/lock trzyma skrót hasła. Reguła pozwala zapisywać
+      postęp tylko temu, kto poda ten sam skrót co w bazie. Nikt — łącznie
+      z aplikacją — nie może nadpisać config/lock inaczej niż ręcznie
+      w konsoli Firebase).
+
+   4. W zakładce Data (Dane) utwórz kolekcję "config" z dokumentem o ID "lock"
+      i jednym polem: hash (typ: string) — patrz niżej, jak wygenerować skrót
+      swojego hasła.
+   5. W Project settings (ikona zębatki) > Your apps > kliknij ikonę "</>" (Web),
+      zarejestruj aplikację i skopiuj obiekt firebaseConfig.
+   6. Wklej go poniżej w miejsce wartości "TU_WKLEJ_...".
+   7. Wgraj plik z powrotem na GitHuba — gotowe, hasło i postęp będą trzymane
+      w bazie, a nie w tym pliku.
+
+   JAK WYGENEROWAĆ SKRÓT HASŁA (bez wpisywania go nigdzie w kodzie):
+   1. Otwórz dowolną stronę w przeglądarce, wciśnij F12 (konsola deweloperska).
+   2. Wklej poniższy kod, podmieniając TWOJE_HASLO na hasło, które chcesz
+      ustawić, i naciśnij Enter:
+
+        crypto.subtle.digest('SHA-256', new TextEncoder().encode('TWOJE_HASLO'))
+          .then(b=>console.log(Array.from(new Uint8Array(b))
+          .map(x=>x.toString(16).padStart(2,'0')).join('')));
+
+   3. Skopiuj wypisany ciąg znaków (64 znaki) i wklej go jako wartość pola
+      "hash" w dokumencie config/lock.
+
+   Dopóki nie wkleisz własnej konfiguracji Firebase i nie utworzysz dokumentu
+   config/lock, ekran logowania nie znajdzie żadnego hasła do porównania —
+   zobaczysz o tym komunikat zamiast formularza.
+*/
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCSfbYa7cUIjgF01XcUCnOrY5mmusnRLdE",
+  authDomain: "bible-12cc4.firebaseapp.com",
+  databaseURL: "https://bible-12cc4-default-rtdb.firebaseio.com",
+  projectId: "bible-12cc4",
+  storageBucket: "bible-12cc4.firebasestorage.app",
+  messagingSenderId: "847997174570",
+  appId: "1:847997174570:web:4f45b9936519b540b21453",
+  measurementId: "G-YCDDEDT7JW"
+};
+
+
+
+const CLOUD_ENABLED = !firebaseConfig.apiKey.startsWith('TU_WKLEJ_apiKey');
+let db = null;
+let cloudDocRef = null;
+if(CLOUD_ENABLED){
+  try{
+    const fbApp = initializeApp(firebaseConfig);
+    db = getFirestore(fbApp);
+    cloudDocRef = doc(db, 'biblePlan', 'progress');
+  }catch(e){
+    console.warn('Nie udało się zainicjować Firebase — działam tylko lokalnie.', e);
+    db = null;
+  }
+}
+
+passwordHashReady = loadPasswordHash();
+
+function setSyncStatus(mode){
+  const el = document.getElementById('syncStatus');
+  if(!el) return;
+  if(!CLOUD_ENABLED || !db){
+    el.textContent = '💾 Zapis lokalny (chmura nieskonfigurowana)';
+    el.className = 'sync-status sync-off';
+    return;
+  }
+  if(mode === 'syncing'){
+    el.textContent = '🔄 Synchronizacja…';
+    el.className = 'sync-status sync-mid';
+  } else if(mode === 'synced'){
+    el.textContent = '☁️ Zapisano w chmurze';
+    el.className = 'sync-status sync-ok';
+  } else {
+    el.textContent = '⚠️ Offline — zapisano tylko lokalnie';
+    el.className = 'sync-status sync-warn';
+  }
+}
+
+async function pushToCloud(){
+  if(!CLOUD_ENABLED || !db) return;
+  if(passwordHashReady) await passwordHashReady;
+  if(!PW_HASH) { setSyncStatus('offline'); return; }
+  setSyncStatus('syncing');
+  try{
+    await setDoc(cloudDocRef, { ...state, pwHash: PW_HASH });
+    setSyncStatus('synced');
+  }catch(e){
+    console.warn('Zapis do chmury nie powiódł się.', e);
+    setSyncStatus('offline');
+  }
+}
+
+function subscribeToCloud(){
+  if(!CLOUD_ENABLED || !db) return;
+  onSnapshot(cloudDocRef, (snap)=>{
+    if(!snap.exists()) return;
+    const cloud = snap.data();
+    if(!cloud || !cloud.status) return;
+    if((cloud.updatedAt||0) > (state.updatedAt||0)){
+      state = {
+        startDate: cloud.startDate,
+        status: cloud.status,
+        lastMarkDate: cloud.lastMarkDate,
+        lastSkipDate: cloud.lastSkipDate,
+        updatedAt: cloud.updatedAt
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderAll();
+    }
+    setSyncStatus('synced');
+  }, (err)=>{
+    console.warn('Błąd nasłuchiwania Firestore.', err);
+    setSyncStatus('offline');
+  });
+}
+
+/* ================= SYNCHRONIZACJA RĘCZNA (przycisk "Synchronizuj") =================
+   Pobiera najnowszy stan z chmury (jeśli jest nowszy niż lokalny), a następnie
+   wypycha bieżący stan z powrotem do chmury — czyli działa w obie strony na żądanie,
+   niezależnie od automatycznej synchronizacji w tle. */
+async function manualSync(){
+  const btn = document.getElementById('syncBtn');
+  if(!btn || btn.classList.contains('is-syncing')) return;
+
+  if(!CLOUD_ENABLED || !db){
+    setSyncStatus('off');
+    alert('Synchronizacja z chmurą nie jest skonfigurowana w tym pliku (brak firebaseConfig) — dane zapisują się tylko lokalnie w tej przeglądarce.');
+    return;
+  }
+
+  btn.classList.add('is-syncing');
+  btn.disabled = true;
+  const originalLabel = btn.innerHTML;
+  btn.innerHTML = '<span class="sync-spin">🔄</span> Synchronizuję…';
+  setSyncStatus('syncing');
+
+  try{
+    if(passwordHashReady) await passwordHashReady;
+
+    const snap = await getDoc(cloudDocRef);
+    if(snap.exists()){
+      const cloud = snap.data();
+      if(cloud && cloud.status){
+        const cloudUpdated = cloud.updatedAt || 0;
+        const localUpdated = state.updatedAt || 0;
+        if(cloudUpdated > localUpdated){
+          state = {
+            startDate: cloud.startDate,
+            status: cloud.status,
+            lastMarkDate: cloud.lastMarkDate,
+            lastSkipDate: cloud.lastSkipDate,
+            updatedAt: cloudUpdated
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+          renderAll();
+        }
+      }
+    }
+
+    if(PW_HASH){
+      await setDoc(cloudDocRef, { ...state, pwHash: PW_HASH });
+    }
+    setSyncStatus('synced');
+  }catch(e){
+    console.warn('Ręczna synchronizacja nie powiodła się.', e);
+    setSyncStatus('offline');
+    alert('Nie udało się zsynchronizować z chmurą. Sprawdź połączenie z internetem i spróbuj ponownie.');
+  }finally{
+    btn.classList.remove('is-syncing');
+    btn.disabled = false;
+    btn.innerHTML = originalLabel;
+  }
+}
+document.getElementById('syncBtn').addEventListener('click', manualSync);
+
+/* ================= STATE ================= */
+function todayISO(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  const off = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - off*60000);
+  return local.toISOString().slice(0,10);
+}
+
+let state = { startDate: todayISO(), status: {} };
+
+async function loadState(){
+  let local = null;
+  try{ local = JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){}
+  if(!local || typeof local !== 'object') local = null;
+  if(local){
+    if(!local.status) local.status = {};
+    if(!local.startDate) local.startDate = todayISO();
+  }
+  state = local || { startDate: todayISO(), status: {} };
+
+  if(CLOUD_ENABLED && db){
+    try{
+      const snap = await getDoc(cloudDocRef);
+      if(snap.exists()){
+        const cloud = snap.data();
+        if(cloud && cloud.status){
+          const cloudUpdated = cloud.updatedAt || 0;
+          const localUpdated = (local && local.updatedAt) || 0;
+          if(cloudUpdated >= localUpdated){
+            state = {
+              startDate: cloud.startDate,
+              status: cloud.status,
+              lastMarkDate: cloud.lastMarkDate,
+              lastSkipDate: cloud.lastSkipDate,
+              updatedAt: cloudUpdated
+            };
+          }
+        }
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      await pushToCloud();
+      subscribeToCloud();
+    }catch(e){
+      console.warn('Nie udało się połączyć z chmurą — działam offline na danych lokalnych.', e);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      setSyncStatus('offline');
+    }
+  } else {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    setSyncStatus('off');
+  }
+}
+
+function saveState(newState){
+  state = newState;
+  state.updatedAt = Date.now();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  pushToCloud();
+}
+
+async function initAndRender(){
+  await loadState();
+  renderAll();
+}
+
+/* ================= HELPERS ================= */
+const MONTH_NAMES_GEN = {}; // not needed, months already Polish in data
+
+function parseISO(iso){
+  const [y,m,d] = iso.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function addDays(date, n){
+  const d = new Date(date);
+  d.setDate(d.getDate()+n);
+  return d;
+}
+function formatDatePL(date){
+  const months = ['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+}
+function daysBetween(a,b){
+  const MS = 86400000;
+  const da = new Date(a.getFullYear(),a.getMonth(),a.getDate());
+  const db = new Date(b.getFullYear(),b.getMonth(),b.getDate());
+  return Math.round((db-da)/MS);
+}
+function toISODate(date){
+  const off = date.getTimezoneOffset();
+  const local = new Date(date.getTime() - off*60000);
+  return local.toISOString().slice(0,10);
+}
+const MONTH_NAMES_NOM = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+function dateForDayNum(dayNum){
+  return addDays(parseISO(state.startDate), dayNum-1);
+}
+function monthKeyForDate(date){
+  return `${date.getFullYear()}-${date.getMonth()}`;
+}
+function monthLabelForDate(date){
+  return `${MONTH_NAMES_NOM[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+function getStatus(dayNum){
+  return state.status[dayNum] || 'pending';
+}
+function setStatus(dayNum, status){
+  if(status === 'pending'){ delete state.status[dayNum]; }
+  else { state.status[dayNum] = status; }
+  saveState(state);
+  renderAll();
+}
+function nextPendingDay(afterDay){
+  for(let i=(afterDay||0)+1; i<=TOTAL; i++){
+    if(getStatus(i) === 'pending') return i;
+  }
+  return null;
+}
+function firstPendingDay(){
+  for(let i=1;i<=TOTAL;i++){
+    if(getStatus(i) === 'pending') return i;
+  }
+  return null;
+}
+
+/* ================= BIBLIA: tekst czytany z pliku biblia.js =================
+   Plik biblia.js (leżący obok index.html) definiuje tablicę BIBLIA:
+   [{k:'rdz', n:'Księga Rodzaju', r:[ [werset1, werset2, ...], ...rozdziały ]}, ...]
+   Żadne dane nie są już pobierane z zewnętrznych stron. */
+const BIB = (typeof BIBLIA !== 'undefined') ? BIBLIA : null;
+const BIB_ERR = 'Nie znaleziono pliku biblia.js. Umieść go w tym samym folderze co index.html i odśwież stronę.';
+const BIB_SOURCE = 'Tekst: Edycja Świętego Pawła, Internetowa Biblia 2000 NG — © 1998–2023 by Digital Gospel';
+const NT_START = BIB ? BIB.findIndex(b => b.k === 'mt') : 0;
+let navigateTo = null; // ustawiane w initNavigation()
+
+function mk(tag, cls, text){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text != null) e.textContent = text;
+  return e;
+}
+
+/* Ostatni werset każdego rozdziału ma w pliku doklejoną stopkę z odnośnikiem
+   i prawami autorskimi — obcinamy ją z wyświetlanego tekstu. */
+const bibChapterCache = new Map();
+function chapterVerses(bi, ci){
+  const key = bi * 1000 + ci;
+  let v = bibChapterCache.get(key);
+  if(!v){
+    const b = BIB[bi];
+    v = b.r[ci].slice();
+    const i = v.length - 1;
+    let t = v[i];
+    const p = t.lastIndexOf(' ' + b.n + ' ' + (ci + 1) + ':1-');
+    t = p >= 0 ? t.slice(0, p) : t.replace(/(?:\s\S+){0,4}\s\d+:1-\d+,\s*Edycja.*$/u, '');
+    v[i] = t.trim();
+    bibChapterCache.set(key, v);
+  }
+  return v;
+}
+function bibRefLabel(bi, c, from, to, whole){
+  return BIB[bi].n + ' ' + c + (whole ? '' : ',' + from + (to > from ? '-' + to : ''));
+}
+function appendVerses(box, bi, c, from, to, hl){
+  const v = chapterVerses(bi, c - 1);
+  for(let n = from; n <= Math.min(to, v.length); n++){
+    const p = mk('p', 'verse' + (n === hl ? ' hl' : ''));
+    p.append(mk('sup', null, n), v[n - 1]);
+    box.appendChild(p);
+  }
+}
+function appendSource(box){ box.appendChild(mk('p', 'source-note', BIB_SOURCE)); }
+
+function copyText(text, btn){
+  const done = () => { const o = btn.textContent; btn.textContent = 'Skopiowano ✓'; setTimeout(() => btn.textContent = o, 1200); };
+  const fallback = () => {
+    const a = document.createElement('textarea');
+    a.value = text; document.body.appendChild(a); a.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    a.remove();
+  };
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+  else fallback();
+}
+
+/* ---------- parser sigli: "J 3,16", "Mt 5,3-12", "Flp 4,4-7.13", "Ps 23", "Rdz 1,1-2,4", "J 3,16; Rz 8,28" ---------- */
+const bibFold = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/[^a-z0-9]/g, '');
+const BIB_ALIAS = { ne:'neh', so:'sof', hb:'hbr', mat:'mt', mar:'mk', luk:'lk', jan:'j' };
+const BIB_IDX = BIB ? BIB.map((b, i) => ({ i, k: bibFold(b.k), n: bibFold(b.n) })) : [];
+
+function findBook(txt){
+  let f = bibFold(txt);
+  if(!f) return [];
+  f = BIB_ALIAS[f] || f;
+  const ex = BIB_IDX.find(x => x.k === f || x.n === f);
+  if(ex) return [ex.i];
+  return BIB_IDX.filter(x => x.k.startsWith(f) || (f.length >= 3 && x.n.includes(f))).map(x => x.i);
+}
+function fmtMissing(arr){
+  return arr.length === 1 ? String(arr[0]) : arr[0] + '–' + arr[arr.length - 1];
+}
+function parseOneRef(bi, rest, out, notes, lenient){
+  const B = BIB[bi], N = B.r.length;
+  const chk = c => {
+    if(c < 1 || c > N) throw new Error(B.n + ' ma tylko ' + N + ' rozdz. (podano ' + c + ').');
+    return c;
+  };
+  const add = (c, from, to) => {
+    const L = B.r[c - 1].length;
+    if(to < from) throw new Error('Odwrócony przedział w „' + rest + '”.');
+    if(from > L) throw new Error(B.n + ' ' + c + ' ma tylko ' + L + ' wersetów (podano ' + from + ').');
+    out.push({ bi, c, from: Math.max(1, from), to: Math.min(to, L), whole: from <= 1 && to >= L });
+  };
+  rest = rest.replace(/(nn?|i?nast)\.?$/i, '');
+
+  if(!rest.includes(',')){
+    const m = rest.match(/^(\d+)(?:-(\d+))?$/);
+    if(!m) throw new Error('Nie rozumiem zapisu „' + rest + '”.');
+    const a = +m[1], b = m[2] ? +m[2] : a;
+    if(b < a) throw new Error('Odwrócony przedział rozdziałów.');
+    if(!lenient){ chk(a); chk(b); }
+    const missing = [];
+    for(let c = a; c <= b; c++){
+      if(c > N) missing.push(c); else add(c, 1, 1e9);
+    }
+    if(missing.length) notes.push('W tej edycji tekstu ' + B.n + ' ma ' + N + ' rozdz. — brak rozdz. ' + fmtMissing(missing) + '.');
+    return;
+  }
+  const m = rest.match(/^(\d+),(.+)$/);
+  let c = chk(+m[1]), p;
+  for(const part of m[2].split('.')){
+    if(p = part.match(/^(\d+)$/)) add(c, +p[1], +p[1]);
+    else if(p = part.match(/^(\d+)-(\d+)$/)) add(c, +p[1], +p[2]);
+    else if(p = part.match(/^(\d+)-(\d+),(\d+)$/)){
+      const c2 = chk(+p[2]);
+      if(c2 <= c) throw new Error('Odwrócony przedział w „' + rest + '”.');
+      add(c, +p[1], 1e9);
+      for(let k = c + 1; k < c2; k++) add(k, 1, 1e9);
+      add(c2, 1, +p[3]);
+      c = c2;
+    }
+    else if(p = part.match(/^(\d+),(\d+)(?:-(\d+))?$/)){ c = chk(+p[1]); add(c, +p[2], +(p[3] || p[2])); }
+    else throw new Error('Nie rozumiem zapisu „' + rest + '”.');
+  }
+}
+function parseRefs(input, opts){
+  const lenient = !!(opts && opts.lenient);
+  const out = [], err = [], notes = [];
+  let cur = null;
+  for(let seg of input.split(/[;\n]+/)){
+    seg = seg.trim();
+    if(!seg) continue;
+    const lead = seg.match(/^[1-3]\s*\.?\s*(?=\p{L})/u), i = lead ? lead[0].length : 0;
+    let j = seg.slice(i).search(/\d/);
+    j = j < 0 ? seg.length : i + j;
+    const bp = seg.slice(0, j).trim();
+    let rest = seg.slice(j);
+    if(bp){
+      const r = findBook(bp);
+      if(!r.length){ err.push('Nie znam księgi „' + bp + '”.'); continue; }
+      if(r.length > 1){ err.push('„' + bp + '” — czy chodzi o: ' + r.slice(0, 6).map(x => BIB[x].n).join(', ') + '?'); continue; }
+      cur = r[0];
+    } else if(cur === null){ err.push('Brak nazwy księgi przy „' + seg + '”.'); continue; }
+    rest = rest.replace(/\s+/g, '').replace(/[–—]/g, '-').replace(/:/g, ',');
+    if(!rest){ err.push('Podaj rozdział po „' + BIB[cur].n + '”.'); continue; }
+    try{ parseOneRef(cur, rest, out, notes, lenient); }catch(e){ err.push(e.message); }
+  }
+  return { out, err, notes };
+}
+/* Rysuje listę fragmentów (nagłówek + wersety). decorate(seg, headEl, wrapEl) — opcjonalne przyciski. */
+function renderSegs(box, segs, decorate){
+  segs.forEach(s => {
+    const wrap = mk('div', 'verse-seg');
+    const head = mk('h3', 'verse-head');
+    head.appendChild(mk('span', null, bibRefLabel(s.bi, s.c, s.from, s.to, s.whole)));
+    wrap.appendChild(head);
+    appendVerses(wrap, s.bi, s.c, s.from, s.to);
+    if(decorate) decorate(s, head, wrap);
+    box.appendChild(wrap);
+  });
+}
+function wireFullscreen(readerEl, expandBtn, backBtn, backdrop){
+  const set = on => {
+    readerEl.classList.toggle('is-fullscreen', on);
+    backdrop.classList.toggle('show', on);
+    document.body.classList.toggle('reader-fullscreen-lock', on);
+  };
+  expandBtn.addEventListener('click', () => set(true));
+  backBtn.addEventListener('click', () => set(false));
+  backdrop.addEventListener('click', () => set(false));
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && readerEl.classList.contains('is-fullscreen')) set(false);
+  });
+}
+
+/* ================= CZYTNIK na stronie „Dziś” (ST / NT z planu) ================= */
+const readerText = document.getElementById('readerText');
+const readerTitle = document.getElementById('readerTitle');
+wireFullscreen(
+  document.getElementById('inlineReader'),
+  document.getElementById('readerExpandBtn'),
+  document.getElementById('readerBackBtn'),
+  document.getElementById('readerBackdrop')
+);
+
+function openReader(refStr, label){
+  readerTitle.textContent = label;
+  readerText.replaceChildren();
+  if(!BIB){
+    readerText.appendChild(mk('p', 'reader-note', BIB_ERR));
+    return;
+  }
+  // tryb „łagodny”: jeśli plan wskazuje rozdział, którego nie ma w tej edycji tekstu, pokazujemy resztę + uwagę
+  const { out, err, notes } = parseRefs(refStr, { lenient: true });
+  notes.concat(err).forEach(m => readerText.appendChild(mk('p', 'reader-note', m)));
+  renderSegs(readerText, out);
+  appendSource(readerText);
+  readerText.scrollTop = 0;
+  document.getElementById('inlineReader').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ================= ZAKŁADKA „BIBLIA”: losowanie / księgi i rozdziały / sigla ================= */
+const bibleSubTabs = Array.from(document.querySelectorAll('.sub-tab'));
+function showBibleSub(id){
+  bibleSubTabs.forEach(b => b.classList.toggle('active', b.dataset.sub === id));
+  document.querySelectorAll('.bible-panel').forEach(p => { p.hidden = p.id !== id; });
+}
+bibleSubTabs.forEach(b => b.addEventListener('click', () => showBibleSub(b.dataset.sub)));
+
+const bibleBookSelect = document.getElementById('bibleBookSelect');
+const bibleChapterSelect = document.getElementById('bibleChapterSelect');
+const bibleReaderText = document.getElementById('bibleReaderText');
+const bibleReaderTitle = document.getElementById('bibleReaderTitle');
+const biblePrevBtn = document.getElementById('biblePrevBtn');
+const bibleNextBtn = document.getElementById('bibleNextBtn');
+const bibleCur = { bi: 0, ci: 0 };
+
+wireFullscreen(
+  document.getElementById('bibleInlineReader'),
+  document.getElementById('bibleReaderExpandBtn'),
+  document.getElementById('bibleReaderBackBtn'),
+  document.getElementById('bibleReaderBackdrop')
+);
+
+function fillChapterSelect(){
+  bibleChapterSelect.replaceChildren();
+  for(let i = 1; i <= BIB[bibleCur.bi].r.length; i++){
+    const o = mk('option', null, i); o.value = i - 1; bibleChapterSelect.appendChild(o);
+  }
+}
+function showChapter(bi, ci, hl){
+  if(bi !== bibleCur.bi || !bibleChapterSelect.options.length){ bibleCur.bi = bi; fillChapterSelect(); }
+  bibleCur.ci = ci;
+  bibleBookSelect.value = bi;
+  bibleChapterSelect.value = ci;
+  bibleReaderTitle.textContent = BIB[bi].n + ' ' + (ci + 1);
+  bibleReaderText.replaceChildren();
+  appendVerses(bibleReaderText, bi, ci + 1, 1, 1e9, hl);
+  appendSource(bibleReaderText);
+  biblePrevBtn.disabled = bi === 0 && ci === 0;
+  bibleNextBtn.disabled = bi === BIB.length - 1 && ci === BIB[bi].r.length - 1;
+  const hlEl = bibleReaderText.querySelector('.hl');
+  if(hlEl) hlEl.scrollIntoView({ block: 'center' }); else bibleReaderText.scrollTop = 0;
+}
+function stepChapter(d){
+  let { bi, ci } = bibleCur;
+  ci += d;
+  if(ci < 0){ if(bi === 0) return; bi--; ci = BIB[bi].r.length - 1; }
+  else if(ci >= BIB[bi].r.length){ if(bi === BIB.length - 1) return; bi++; ci = 0; }
+  showChapter(bi, ci);
+}
+function openInChapterTab(bi, ci, verse){
+  showBibleSub('bs-czytaj');
+  showChapter(bi, ci, verse);
+  if(navigateTo) navigateTo('page-bible');
+}
+
+function initBibleUI(){
+  if(!BIB){
+    ['quoteCard', 'bibleReaderText', 'siglaOut'].forEach(id => {
+      const el = document.getElementById(id);
+      el.replaceChildren(mk('p', 'reader-note', BIB_ERR));
+      el.hidden = false;
+    });
+    return;
+  }
+
+  /* --- 1. Wylosuj cytat --- */
+  let totals = null, lastQuote = null;
+  const quoteCard = document.getElementById('quoteCard');
+  const quoteActions = document.getElementById('quoteActions');
+  function randomQuote(){
+    if(!totals) totals = BIB.map(b => b.r.reduce((s, ch) => s + ch.length, 0));
+    const scope = document.getElementById('quoteScope').value;
+    const lo = scope === 'nt' ? NT_START : 0, hi = scope === 'st' ? NT_START : BIB.length;
+    let sum = 0;
+    for(let i = lo; i < hi; i++) sum += totals[i];
+    let r = Math.floor(Math.random() * sum), bi = lo;
+    while(r >= totals[bi]){ r -= totals[bi]; bi++; }
+    let ci = 0;
+    while(r >= BIB[bi].r[ci].length){ r -= BIB[bi].r[ci].length; ci++; }
+    lastQuote = { bi, ci, v: r + 1, text: chapterVerses(bi, ci)[r] };
+    quoteCard.replaceChildren(
+      mk('blockquote', 'quote-text', '„' + lastQuote.text + '”'),
+      mk('cite', 'quote-cite', bibRefLabel(bi, ci + 1, r + 1, r + 1))
+    );
+    quoteActions.hidden = false;
+  }
+  document.getElementById('quoteBtn').addEventListener('click', randomQuote);
+  document.getElementById('quoteCopyBtn').addEventListener('click', e => {
+    if(lastQuote) copyText('„' + lastQuote.text + '” — ' + bibRefLabel(lastQuote.bi, lastQuote.ci + 1, lastQuote.v, lastQuote.v), e.currentTarget);
+  });
+  document.getElementById('quoteContextBtn').addEventListener('click', () => {
+    if(lastQuote) openInChapterTab(lastQuote.bi, lastQuote.ci, lastQuote.v);
+  });
+
+  /* --- 2. Księga i rozdział + strzałki --- */
+  [['Stary Testament', 0, NT_START], ['Nowy Testament', NT_START, BIB.length]].forEach(([label, a, b]) => {
+    const g = document.createElement('optgroup');
+    g.label = label;
+    for(let i = a; i < b; i++){ const o = mk('option', null, BIB[i].n); o.value = i; g.appendChild(o); }
+    bibleBookSelect.appendChild(g);
+  });
+  bibleBookSelect.addEventListener('change', () => showChapter(+bibleBookSelect.value, 0));
+  bibleChapterSelect.addEventListener('change', () => showChapter(bibleCur.bi, +bibleChapterSelect.value));
+  biblePrevBtn.addEventListener('click', () => stepChapter(-1));
+  bibleNextBtn.addEventListener('click', () => stepChapter(1));
+  document.addEventListener('keydown', e => {
+    if(e.altKey || e.ctrlKey || e.metaKey) return;
+    if(/^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if(document.getElementById('bs-czytaj').hidden) return;
+    const active = document.querySelector('.tab-btn.active');
+    if(!active || active.dataset.target !== 'page-bible') return;
+    if(document.getElementById('lockOverlay').style.display !== 'none') return;
+    if(e.key === 'ArrowLeft'){ stepChapter(-1); e.preventDefault(); }
+    if(e.key === 'ArrowRight'){ stepChapter(1); e.preventDefault(); }
+  });
+  showChapter(0, 0);
+
+  /* --- 3. Wpisz sigla --- */
+  const siglaIn = document.getElementById('siglaIn');
+  const siglaOut = document.getElementById('siglaOut');
+  const siglaErr = document.getElementById('siglaErr');
+  function renderSigla(){
+    siglaOut.replaceChildren();
+    siglaErr.replaceChildren();
+    if(!siglaIn.value.trim()){ siglaOut.hidden = true; return; }
+    const { out, err } = parseRefs(siglaIn.value);
+    err.forEach(m => siglaErr.appendChild(mk('div', 'sigla-err', m)));
+    siglaOut.hidden = !out.length;
+    renderSegs(siglaOut, out, (s, head, wrap) => {
+      const actions = mk('span', 'verse-actions');
+      const copyBtn = mk('button', 'mini', 'Kopiuj');
+      copyBtn.type = 'button';
+      copyBtn.addEventListener('click', () => {
+        const label = head.firstChild.textContent;
+        const text = Array.from(wrap.querySelectorAll('.verse')).map(p => p.textContent).join(' ');
+        copyText(label + '\n' + text, copyBtn);
+      });
+      const openBtn = mk('button', 'mini', 'Otwórz rozdział');
+      openBtn.type = 'button';
+      openBtn.addEventListener('click', () => openInChapterTab(s.bi, s.c - 1, s.from));
+      actions.append(copyBtn, openBtn);
+      head.appendChild(actions);
+    });
+    if(out.length) appendSource(siglaOut);
+  }
+  let siglaTimer = null;
+  siglaIn.addEventListener('input', () => { clearTimeout(siglaTimer); siglaTimer = setTimeout(renderSigla, 150); });
+  const chips = document.getElementById('siglaExamples');
+  ['J 3,16', 'Rdz 1,1-5', 'Mt 5,3-12', 'Flp 4,4-7.13', '1 Kor 13,4-7', 'Ps 23', 'Rdz 1,1-2,4', 'J 3,16; Rz 8,28'].forEach(x => {
+    const c = mk('button', 'chip', x);
+    c.type = 'button';
+    c.addEventListener('click', () => { siglaIn.value = x; renderSigla(); });
+    chips.appendChild(c);
+  });
+}
+initBibleUI();
+
+/* ================= USTAWIENIA: odświeżenie strony i motyw jasny/ciemny ================= */
+document.getElementById('refreshBtn').onclick = () => location.reload();
+
+const THEME_KEY = 'biblePlanTheme_v1';
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+function applyTheme(theme){
+  document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Jasny motyw' : '🌙 Ciemny motyw';
+  if(themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f151b' : '#152a3e');
+}
+let currentTheme = 'light';
+try{ currentTheme = localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; }catch(e){}
+applyTheme(currentTheme);
+themeToggleBtn.onclick = () => {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  try{ localStorage.setItem(THEME_KEY, currentTheme); }catch(e){}
+  applyTheme(currentTheme);
+};
+
+/* ================= RENDER: DASHBOARD ================= */
+function renderDashboard(){
+  const doneCount = Object.values(state.status).filter(s=>s==='done').length;
+  const skippedCount = Object.values(state.status).filter(s=>s==='skipped').length;
+  const processed = doneCount + skippedCount;
+  const remaining = TOTAL - processed;
+  const percent = Math.round((processed/TOTAL)*1000)/10;
+
+  document.getElementById('statDone').textContent = `${processed}/${TOTAL}`;
+  document.getElementById('statRemaining').textContent = remaining;
+  document.getElementById('statPercent').textContent = percent + '%';
+  document.getElementById('progressFill').style.width = percent + '%';
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  let endLabel = '—';
+  if(remaining <= 0){
+    endLabel = 'Plan ukończony! 🎉';
+  } else {
+    const projected = addDays(today, remaining - 1);
+    endLabel = formatDatePL(projected);
+  }
+  document.getElementById('endDate').textContent = endLabel;
+
+  // pace vs original schedule
+  const start = parseISO(state.startDate);
+  const elapsed = daysBetween(start, today); // 0 on start day
+  const expected = Math.min(TOTAL, Math.max(0, elapsed + 1));
+  const diff = processed - expected;
+  const paceEl = document.getElementById('paceTag');
+  if(remaining <= 0){
+    paceEl.textContent = 'ukończono';
+    paceEl.className = 'pace-tag pace-ahead';
+  } else if(diff > 0){
+    paceEl.textContent = `${diff} ${diff===1?'dzień':'dni'} do przodu`;
+    paceEl.className = 'pace-tag pace-ahead';
+  } else if(diff < 0){
+    paceEl.textContent = `${-diff} ${(-diff)===1?'dzień':'dni'} do tyłu`;
+    paceEl.className = 'pace-tag pace-behind';
+  } else {
+    paceEl.textContent = 'dokładnie na czasie';
+    paceEl.className = 'pace-tag pace-ontime';
+  }
+
+  const nominalEnd = addDays(start, TOTAL - 1);
+  document.getElementById('nominalEndNote').textContent = `(pierwotny termin bez zmian: ${formatDatePL(nominalEnd)})`;
+
+  document.getElementById('startDateInput').value = state.startDate;
+  document.getElementById('todayLabel').textContent = formatDatePL(today);
+}
+
+/* ================= RENDER: CURRENT CARD ================= */
+function renderCurrentCard(){
+  const card = document.getElementById('currentCard');
+  const readBtnsWrap = document.getElementById('readButtons');
+  const dayNum = firstPendingDay();
+  if(dayNum === null){
+    card.innerHTML = `<div class="all-done-msg">Ukończyłeś/aś cały roczny plan czytania. 🎉<br>Chwała Bogu!</div>`;
+    if(readBtnsWrap) readBtnsWrap.innerHTML = '';
+    return;
+  }
+  const day = PLAN[dayNum-1];
+  const date = dateForDayNum(dayNum);
+  const today = todayISO();
+  const markedToday = state.lastMarkDate === today;
+  const skippedToday = state.lastSkipDate === today;
+
+  card.innerHTML = `
+    <div class="tag">Dzień ${day.d} · ${formatDatePL(date)}</div>
+    <h2>Twoja dzisiejsza lektura</h2>
+    <div class="reading-lines">
+      <div class="reading-line"><span class="k">ST</span><span>${day.ot}</span></div>
+      <div class="reading-line"><span class="k">NT</span><span>${day.nt}</span></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" id="markDoneBtn" ${markedToday ? 'disabled' : ''}>✔ Przeczytane</button>
+      <button class="btn-secondary" id="markExtraBtn" ${markedToday ? '' : 'disabled'}>➕ Czytam też kolejny dzień</button>
+      <button class="btn-skip" id="markSkipBtn" ${skippedToday ? 'disabled' : ''}>⏭ Dziś nie czytam</button>
+    </div>
+    ${markedToday ? '<div class="marked-note">Dzisiejszy fragment został już oznaczony jako przeczytany. Wróć jutro, aby oznaczyć kolejny — albo skorzystaj z „Czytam też kolejny dzień”.</div>' : ''}
+    ${skippedToday ? '<div class="marked-note">Już przesunąłeś/aś dziś plan o jeden dzień. Kolejną zmianę będzie można wprowadzić jutro.</div>' : ''}
+  `;
+
+  if(readBtnsWrap){
+    readBtnsWrap.innerHTML = `
+      <button class="read-btn read-ot" id="readOtBtn" ${day.ot === '-' ? 'disabled' : ''}>
+        <span class="read-btn-icon">📜</span>
+        <span class="read-btn-text">
+          <span class="read-btn-label">Stary Testament</span>
+          <span class="read-btn-ref">${day.ot === '-' ? 'Brak fragmentu na dziś' : day.ot}</span>
+        </span>
+        <span class="read-btn-arrow">›</span>
+      </button>
+      <button class="read-btn read-nt" id="readNtBtn" ${day.nt === '-' ? 'disabled' : ''}>
+        <span class="read-btn-icon">✝️</span>
+        <span class="read-btn-text">
+          <span class="read-btn-label">Nowy Testament</span>
+          <span class="read-btn-ref">${day.nt === '-' ? 'Brak fragmentu na dziś' : day.nt}</span>
+        </span>
+        <span class="read-btn-arrow">›</span>
+      </button>
+    `;
+  }
+
+  const readOtBtn = document.getElementById('readOtBtn');
+  const readNtBtn = document.getElementById('readNtBtn');
+  if(readOtBtn) readOtBtn.onclick = () => openReader(day.ot, `ST · ${day.ot}`);
+  if(readNtBtn) readNtBtn.onclick = () => openReader(day.nt, `NT · ${day.nt}`);
+
+  document.getElementById('markDoneBtn').onclick = () => {
+    if(markedToday) return;
+    state.lastMarkDate = today;
+    setStatus(dayNum, 'done');
+  };
+  document.getElementById('markExtraBtn').onclick = () => {
+    if(!markedToday) return;
+    if(!confirm(`Czy na pewno chcesz dodatkowo oznaczyć jako przeczytany dzień ${dayNum} (${formatDatePL(date)})?`)) return;
+    setStatus(dayNum, 'done');
+  };
+  document.getElementById('markSkipBtn').onclick = () => {
+    if(skippedToday) return;
+    if(!confirm('Czy na pewno dziś nie czytasz? Cały plan przesunie się o jeden dzień, a dzisiejszy fragment stanie się jutrzejszym.')) return;
+    state.lastSkipDate = today;
+    const newStart = addDays(parseISO(state.startDate), 1);
+    state.startDate = toISODate(newStart);
+    saveState(state);
+    renderAll();
+  };
+}
+
+/* ================= RENDER: MONTH LIST ================= */
+function cycleStatus(dayNum){
+  const cur = getStatus(dayNum);
+  const nextMap = { pending:'done', done:'skipped', skipped:'pending' };
+  setStatus(dayNum, nextMap[cur]);
+}
+
+function renderMonths(){
+  const wrap = document.getElementById('monthsWrap');
+
+  // Grupowanie wg rzeczywistego miesiąca kalendarzowego, liczonego od daty rozpoczęcia planu
+  const monthOrder = [];
+  const monthMap = new Map();
+  PLAN.forEach(day=>{
+    const date = dateForDayNum(day.d);
+    const key = monthKeyForDate(date);
+    if(!monthMap.has(key)){
+      monthMap.set(key, { label: monthLabelForDate(date), days: [] });
+      monthOrder.push(key);
+    }
+    monthMap.get(key).days.push(day);
+  });
+
+  const openState = {};
+  wrap.querySelectorAll('details.month').forEach(d=>{
+    openState[d.dataset.month] = d.open;
+  });
+
+  wrap.innerHTML = '';
+  const firstPending = firstPendingDay();
+
+  monthOrder.forEach(key=>{
+    const info = monthMap.get(key);
+    const daysInMonth = info.days;
+    const doneInMonth = daysInMonth.filter(d=>getStatus(d.d)==='done'||getStatus(d.d)==='skipped').length;
+
+    const details = document.createElement('details');
+    details.className = 'month';
+    details.dataset.month = key;
+    if(openState[key]) details.open = true;
+
+    const summary = document.createElement('summary');
+    summary.className = 'month-head';
+    summary.innerHTML = `<span><span class="arrow">▶</span>${info.label}</span><span class="marker">${doneInMonth}/${daysInMonth.length}</span>`;
+    details.appendChild(summary);
+
+    daysInMonth.forEach(day=>{
+      const st = getStatus(day.d);
+      const row = document.createElement('div');
+      row.className = 'day-row' + (st==='done'?' is-done':st==='skipped'?' is-skipped':'') + (day.d===firstPending?' is-current':'');
+      const statusLabel = st==='done' ? 'Przeczytane' : st==='skipped' ? 'Pominięte' : 'Oznacz';
+      row.innerHTML = `
+        <span class="day-num">${day.d}</span>
+        <span class="day-text ot"><strong>ST</strong> ${day.ot}</span>
+        <span class="day-text nt"><strong>NT</strong> ${day.nt}</span>
+        <button class="status-btn" data-day="${day.d}">${statusLabel}</button>
+      `;
+      row.querySelector('.status-btn').onclick = () => cycleStatus(day.d);
+      details.appendChild(row);
+    });
+
+    wrap.appendChild(details);
+  });
+}
+
+/* ================= RENDER ALL ================= */
+function renderAll(){
+  renderDashboard();
+  renderCurrentCard();
+  renderMonths();
+}
+
+/* ================= EVENTS ================= */
+document.getElementById('startDateInput').addEventListener('change', (e)=>{
+  state.startDate = e.target.value;
+  saveState(state);
+  renderAll();
+});
+
+document.getElementById('expandAllBtn').onclick = ()=>{
+  document.querySelectorAll('details.month').forEach(d=>d.open=true);
+};
+document.getElementById('collapseAllBtn').onclick = ()=>{
+  document.querySelectorAll('details.month').forEach(d=>d.open=false);
+};
+
+document.getElementById('resetBtn').onclick = ()=>{
+  if(confirm('Na pewno chcesz zresetować cały postęp? Tej operacji nie można cofnąć.')){
+    state = { startDate: todayISO(), status: {} };
+    saveState(state);
+    renderAll();
+  }
+};
+
+document.getElementById('exportBtn').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `postep-plan-czytania-${todayISO()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+const importDialog = document.getElementById('importDialog');
+document.getElementById('importBtn').onclick = ()=>{
+  document.getElementById('importText').value = '';
+  importDialog.showModal();
+};
+document.getElementById('importCancel').onclick = ()=> importDialog.close();
+document.getElementById('importConfirm').onclick = ()=>{
+  try{
+    const parsed = JSON.parse(document.getElementById('importText').value);
+    if(!parsed.startDate || !parsed.status) throw new Error('invalid');
+    state = { startDate: parsed.startDate, status: parsed.status };
+    saveState(state);
+    renderAll();
+    importDialog.close();
+  }catch(e){
+    alert('Nie udało się wczytać danych. Sprawdź, czy wklejony tekst to poprawny JSON wyeksportowany z tej aplikacji.');
+  }
+};
+
+/* ================= APP NAVIGATION =================
+   Mobile: horizontal swipe between full-screen pages (bottom tab bar).
+   Desktop: classic single-page website navigation (top nav bar, one
+   section shown at a time, page scrolls to top on switch). */
+(function initNavigation(){
+  const scroller = document.getElementById('pagesScroller');
+  if(!scroller) return;
+  const pages = Array.from(scroller.querySelectorAll('.app-page'));
+  const navButtons = Array.from(document.querySelectorAll('[data-target].tab-btn, [data-target].nav-link'));
+  const desktopQuery = window.matchMedia('(min-width:701px)');
+
+  function isDesktop(){ return desktopQuery.matches; }
+
+  function setActiveButtons(id){
+    navButtons.forEach(b => b.classList.toggle('active', b.dataset.target === id));
+  }
+
+  function showDesktopPage(id){
+    pages.forEach(p => p.classList.toggle('is-active', p.id === id));
+    setActiveButtons(id);
+  }
+
+  function goTo(id, {userInitiated} = {}){
+    if(isDesktop()){
+      showDesktopPage(id);
+      if(userInitiated) window.scrollTo({ top:0, behavior:'smooth' });
+    } else {
+      const target = document.getElementById(id);
+      if(target) scroller.scrollTo({ left: target.offsetLeft, behavior: userInitiated ? 'smooth' : 'auto' });
+      setActiveButtons(id);
+    }
+  }
+
+  navButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=> goTo(btn.dataset.target, { userInitiated:true }));
+  });
+
+  navigateTo = (id) => goTo(id, { userInitiated:true });
+
+  // Mobile: keep tab bar in sync while the user swipes between pages.
+  let scrollTimer = null;
+  scroller.addEventListener('scroll', ()=>{
+    if(isDesktop()) return;
+    if(scrollTimer) clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(()=>{
+      const w = scroller.clientWidth || 1;
+      const idx = Math.round(scroller.scrollLeft / w);
+      const page = pages[Math.max(0, Math.min(pages.length-1, idx))];
+      if(page) setActiveButtons(page.id);
+    }, 60);
+  }, { passive:true });
+
+  function currentActiveId(){
+    const active = navButtons.find(b=>b.classList.contains('active'));
+    return (active && active.dataset.target) || pages[0].id;
+  }
+
+  function applyModeLayout(){
+    const id = currentActiveId();
+    if(isDesktop()){
+      showDesktopPage(id);
+    } else {
+      pages.forEach(p => p.classList.remove('is-active'));
+      goTo(id, { userInitiated:false });
+    }
+  }
+
+  desktopQuery.addEventListener ? desktopQuery.addEventListener('change', applyModeLayout) : desktopQuery.addListener(applyModeLayout);
+  window.addEventListener('resize', applyModeLayout);
+
+  applyModeLayout();
+})();
+
+/* ================= PWA: rejestracja service workera ================= */
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./service-worker.js').catch((err)=>{
+      console.warn('Nie udało się zarejestrować service workera.', err);
+    });
+  });
+}
+
+/* ================= INIT ================= */
+if(sessionStorage.getItem(PW_SESSION_KEY) === '1'){
+  unlockApp();
+}
+</script>
+</body>
+</html>
