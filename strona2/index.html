@@ -15,6 +15,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Newsreader:ital,wght@0,400;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=7">
+<style>
+  /* link "Biblia" w nawigacji wygląda jak pozostałe zakładki */
+  #nav a.nav-ext{font:inherit;color:inherit;text-decoration:none;cursor:pointer;display:inline-flex;align-items:center;gap:inherit;}
+</style>
 </head>
 <body>
 
@@ -37,6 +41,7 @@
       <button data-tab="browse" class="on"><span class="ic">🔎</span>Przeglądaj</button>
       <button data-tab="latest"><span class="ic">🕒</span>Najnowsze</button>
       <button data-tab="admin" id="adminTabBtn" hidden><span class="ic">👥</span>Użytkownicy</button>
+      <a href="biblia.html" class="nav-ext" id="bibliaLink"><span class="ic">📖</span>Biblia</a>
     </nav>
     <span class="who"><span id="whoName"></span> <button id="setBtn" class="link" aria-label="Powiadomienia">🔔</button> <button id="logoutBtn" class="link">Wyloguj</button></span>
   </header>

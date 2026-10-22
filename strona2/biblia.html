@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#152a3e">
+<title>Biblia</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Biblia">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --card:#f7f8fa;
+    --card-border:#e4e7eb;
+    --ink:#20242b;
+    --ink-soft:#5b6270;
+    --navy:#1f3b57;
+    --navy-dark:#152a3e;
+    --gold:#b8862b;
+    --gold-soft:#f2e6cd;
+    --green:#3f7355;
+    --green-soft:#e4efe8;
+    --rust:#a85b2e;
+    --rust-soft:#f3e6dd;
+    --radius:14px;
+    --surface:#ffffff;
+    --page-bg:#eef1f4;
+    --header-bg:rgba(255,255,255,0.92);
+    --heading:var(--navy-dark);
+    --track:#e9ebee;
+    color-scheme:light;
+  }
+  html.theme-dark{
+    --bg:#0f151b;
+    --card:#1a2129;
+    --card-border:#2b3540;
+    --ink:#e8ecf1;
+    --ink-soft:#9aa7b6;
+    --navy:#5c93bb;
+    --navy-dark:#17293c;
+    --gold:#dcae5f;
+    --gold-soft:#3a2f1a;
+    --green:#72bd94;
+    --green-soft:#17281f;
+    --rust:#e0916a;
+    --rust-soft:#33201a;
+    --surface:#1a2129;
+    --page-bg:#0a0e12;
+    --header-bg:rgba(15,21,27,0.92);
+    --heading:#f5f8fb;
+    --track:#2b3540;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:48px;
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:20px 16px 8px;}
+  header.top{
+    border-bottom:2px solid var(--navy);
+    margin-bottom:20px;
+  }
+  .header-inner{
+    max-width:820px;
+    margin:0 auto;
+    padding:20px 16px 14px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+  }
+  header.top h1{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    font-size:1.5rem;
+    color:var(--heading);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header.top .sub{
+    font-size:0.78rem;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .site-nav{display:none;}
+  .page-heading{display:none;}
+
+  /* ============= "Czytaj ST / Czytaj NT" buttons below the reading card ============= */
+  .read-buttons{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .read-btn{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+    text-align:left;
+    font-family:'Inter',sans-serif;
+    transition:transform .1s ease, border-color .15s ease, box-shadow .15s ease;
+    box-shadow:0 1px 2px rgba(20,30,45,0.05);
+  }
+  .read-btn:active{transform:scale(0.97);}
+  .read-btn:hover{border-color:var(--gold);box-shadow:0 3px 10px rgba(184,134,43,0.16);}
+  .read-btn-icon{
+    flex:none;
+    font-size:1.25rem;
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    background:var(--gold-soft);
+  }
+  .read-nt .read-btn-icon{background:var(--green-soft);}
+  .read-btn-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    min-width:0;
+    flex:1;
+  }
+  .read-btn-label{
+    font-size:0.8rem;
+    font-weight:700;
+    color:var(--heading);
+  }
+  .read-btn-ref{
+    font-size:0.76rem;
+    color:var(--ink-soft);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .read-btn-arrow{
+    flex:none;
+    font-size:1.3rem;
+    color:var(--gold);
+  }
+  .read-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .read-btn:disabled:hover{border-color:var(--card-border);box-shadow:0 1px 2px rgba(20,30,45,0.05);}
+
+  /* dashboard */
+  .dash{
+    background:var(--card);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    padding:18px 18px 16px;
+    margin-bottom:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .dash:before{
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:5px; height:100%;
+    background:var(--gold);
+  }
+  .dash-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-bottom:14px;
+  }
+  .stat .num{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    font-size:1.5rem;
+    color:var(--heading);
+    display:block;
+    line-height:1.1;
+  }
+  .stat .lbl{
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .progress-track{
+    background:var(--track);
+    border-radius:99px;
+    height:10px;
+    overflow:hidden;
+    margin-bottom:10px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--gold),#d4ab55);
+    border-radius:99px;
+    transition:width .4s ease;
+  }
+  .dash-foot{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 18px;
+    font-size:0.85rem;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .pace-tag{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:99px;
+    font-size:0.75rem;
+    font-weight:600;
+  }
+  .pace-ahead{background:var(--green-soft);color:var(--green);}
+  .pace-behind{background:var(--rust-soft);color:var(--rust);}
+  .pace-ontime{background:var(--gold-soft);color:var(--gold);}
+  .end-date{font-weight:600;color:var(--heading);}
+  .settings-row{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--card-border);
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    font-size:0.82rem;
+    color:var(--ink-soft);
+  }
+  .settings-row input[type=date]{
+    font-family:inherit;
+    font-size:0.85rem;
+    padding:4px 6px;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .settings-row select{
+    font-family:inherit;
+    font-size:0.85rem;
+    padding:6px 8px;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .settings-row label{color:var(--ink-soft);}
+
+  /* current card */
+  .current-card{
+    background:var(--navy-dark);
+    color:#fff;
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:20px;
+    position:relative;
+  }
+  .current-card .tag{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#c9d4de;
+    margin-bottom:6px;
+  }
+  .current-card h2{
+    font-family:'Source Serif 4',serif;
+    margin:0 0 12px;
+    font-size:1.3rem;
+    font-weight:600;
+  }
+  .reading-lines{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:16px;
+  }
+  .reading-line{
+    display:flex;
+    gap:8px;
+    align-items:baseline;
+    font-size:1.02rem;
+  }
+  .reading-line .k{
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:#e8d3a0;
+    width:34px;
+    flex:none;
+  }
+  .btn-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  button{
+    font-family:'Inter',sans-serif;
+    cursor:pointer;
+    border:none;
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:0.88rem;
+    font-weight:600;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  button:active{transform:scale(0.97);}
+  .btn-primary{background:var(--gold);color:#2a1f0a;}
+  .btn-secondary{background:rgba(255,255,255,0.14);color:#fff;}
+  .btn-skip{background:transparent;color:#c9d4de;border:1px solid rgba(255,255,255,0.3);}
+  .all-done-msg{
+    font-family:'Source Serif 4',serif;
+    font-size:1.15rem;
+    text-align:center;
+    padding:10px 0 4px;
+  }
+
+  /* utility bar */
+  .util-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:20px;
+  }
+  .util-bar button{
+    background:var(--surface);
+    color:var(--heading);
+    border:1px solid var(--card-border);
+    font-size:0.78rem;
+    padding:8px 12px;
+  }
+  .util-bar button:hover{border-color:var(--navy);}
+
+  /* month accordion */
+  details.month{
+    border:1px solid var(--card-border);
+    border-radius:12px;
+    margin-bottom:10px;
+    overflow:hidden;
+    background:var(--surface);
+  }
+  details.month[open]{border-color:var(--navy);}
+  summary.month-head{
+    list-style:none;
+    cursor:pointer;
+    padding:13px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    font-size:1.02rem;
+    color:var(--heading);
+    background:var(--card);
+  }
+  summary.month-head::-webkit-details-marker{display:none;}
+  summary.month-head .marker{
+    font-family:'Inter',sans-serif;
+    font-size:0.9rem;
+    color:var(--ink-soft);
+    font-weight:500;
+  }
+  summary.month-head .arrow{
+    display:inline-block;
+    margin-right:8px;
+    transition:transform .15s ease;
+    color:var(--gold);
+  }
+  details[open] summary.month-head .arrow{transform:rotate(90deg);}
+
+  .day-row{
+    display:grid;
+    grid-template-columns:38px 1fr 1fr 90px;
+    gap:10px;
+    align-items:center;
+    padding:10px 16px;
+    border-top:1px solid var(--card-border);
+    font-size:0.86rem;
+  }
+  .day-row.is-done{background:var(--green-soft);}
+  .day-row.is-skipped{background:var(--rust-soft);}
+  .day-row.is-current{background:var(--gold-soft);}
+  .day-num{
+    font-weight:700;
+    color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;
+  }
+  .day-row.is-done .day-num,.day-row.is-done .day-text{color:var(--green);}
+  .day-row.is-skipped .day-num,.day-row.is-skipped .day-text{color:var(--rust);}
+  .day-text{color:var(--ink);}
+  .day-row.is-done .day-text{text-decoration:line-through;text-decoration-color:rgba(63,115,85,0.45);}
+  .status-btn{
+    justify-self:end;
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    color:var(--ink-soft);
+    font-size:0.72rem;
+    padding:6px 8px;
+    border-radius:8px;
+    white-space:nowrap;
+  }
+  .day-row.is-done .status-btn{background:var(--green);color:#fff;border-color:var(--green);}
+  .day-row.is-skipped .status-btn{background:var(--rust);color:#fff;border-color:var(--rust);}
+
+  footer{
+    padding:24px 0 0;
+    border-top:1px dashed var(--card-border);
+    margin-top:8px;
+  }
+  .footer-util{
+    justify-content:center;
+    margin-bottom:0;
+  }
+  .footer-util button{
+    font-size:0.76rem;
+    opacity:0.85;
+  }
+  .footer-util button:hover{opacity:1;}
+
+  @media (max-width:560px){
+    .dash-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+    .stat .num{font-size:1.2rem;}
+    .day-row{
+      grid-template-columns:28px 1fr 78px;
+      grid-template-areas:
+        "num ot status"
+        "num nt status";
+      row-gap:2px;
+    }
+    .day-num{grid-area:num;}
+    .day-text.ot{grid-area:ot;}
+    .day-text.nt{grid-area:nt;}
+    .status-btn{grid-area:status;}
+    header.top{flex-direction:column;align-items:flex-start;gap:2px;}
+  }
+
+  button:disabled{opacity:0.4;cursor:not-allowed;}
+  button:disabled:active{transform:none;}
+  .marked-note{
+    font-size:0.78rem;
+    color:#c9d4de;
+    margin-top:10px;
+  }
+  .sync-status{
+    font-size:0.75rem;
+    padding:2px 8px;
+    border-radius:99px;
+    margin-left:auto;
+  }
+  .sync-off{color:var(--ink-soft);background:transparent;}
+  .sync-mid{color:var(--gold);background:var(--gold-soft);}
+  .sync-ok{color:var(--green);background:var(--green-soft);}
+  .sync-warn{color:var(--rust);background:var(--rust-soft);}
+
+  dialog{
+    border:1px solid var(--card-border);
+    border-radius:14px;
+    padding:0;
+    max-width:420px;
+    width:90%;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  dialog::backdrop{background:rgba(20,30,40,0.5);}
+  .dialog-body{padding:20px;}
+  .dialog-body h3{font-family:'Source Serif 4',serif;margin-top:0;}
+  .dialog-body textarea{
+    width:100%;
+    min-height:110px;
+    font-family:monospace;
+    font-size:0.78rem;
+    border:1px solid var(--card-border);
+    border-radius:8px;
+    padding:8px;
+    background:var(--surface);
+    color:var(--ink);
+  }
+  .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;}
+  .dialog-actions button.close-btn{background:var(--card);color:var(--ink);}
+
+  /* ===================== CZYTNIK: ramka z tekstem rozdziału (tekst z pliku biblia.js) ===================== */
+  .inline-reader{
+    background:var(--surface);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:20px;
+    box-shadow:0 1px 2px rgba(20,30,45,0.05);
+  }
+  .inline-reader .reader-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    background:var(--navy-dark);
+    color:#fff;
+  }
+  .inline-reader .reader-title{
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    font-size:0.92rem;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .inline-reader .reader-head-actions{flex:none;display:flex;align-items:center;gap:6px;}
+  .inline-reader .reader-head-actions a,
+  .inline-reader .reader-head-actions button{
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:0.8rem;
+    font-family:inherit;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+  }
+  .inline-reader .reader-head-actions a:hover,
+  .inline-reader .reader-head-actions button:hover{background:rgba(255,255,255,0.22);}
+  .inline-reader .back-btn{display:none;background:rgba(255,255,255,0.18) !important;}
+  .inline-reader .reader-body{
+    position:relative;
+    height:60vh;
+    min-height:360px;
+    max-height:640px;
+    background:var(--surface);
+  }
+  .reader-text{
+    position:absolute;
+    inset:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:16px 18px 22px;
+    font-family:'Source Serif 4',Georgia,serif;
+    font-size:1.04rem;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .reader-hint{color:var(--ink-soft);font-family:'Inter',sans-serif;font-size:0.9rem;text-align:center;padding:24px 8px;margin:0;}
+  .reader-note{font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--rust);background:var(--rust-soft);border-radius:8px;padding:8px 10px;margin:0 0 12px;}
+  .verse-seg + .verse-seg{margin-top:22px;padding-top:16px;border-top:1px solid var(--card-border);}
+  .verse-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px;font-family:'Source Serif 4',serif;font-size:1.06rem;font-weight:600;color:var(--heading);}
+  .verse-actions{display:flex;gap:6px;}
+  .mini{background:var(--card);color:var(--heading);border:1px solid var(--card-border);font-size:0.74rem;padding:4px 10px;border-radius:8px;}
+  .mini:hover{border-color:var(--navy);}
+  .verse{margin:0 0 0.4em;}
+  .verse sup{font-family:'Inter',sans-serif;font-size:0.62em;font-weight:700;color:var(--gold);margin-right:0.35em;}
+  .verse.hl{background:var(--gold-soft);border-radius:4px;padding:0 4px;margin-left:-4px;}
+  .source-note{font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--ink-soft);margin:22px 0 0;line-height:1.4;}
+  [hidden]{display:none !important;}
+
+  /* podzakładki strony „Biblia” */
+  .sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+  .sub-tab{background:var(--surface);color:var(--ink-soft);border:1px solid var(--card-border);font-size:0.85rem;padding:9px 14px;border-radius:99px;}
+  .sub-tab.active{background:var(--navy-dark);color:#fff;border-color:var(--navy-dark);}
+  .quote-card{padding:24px 24px 22px 26px;}
+  .quote-text{margin:0;font-family:'Source Serif 4',serif;font-size:1.35rem;line-height:1.55;color:var(--ink);}
+  .quote-cite{display:block;margin-top:14px;font-style:normal;font-weight:700;font-size:0.95rem;color:var(--gold);}
+  .sigla-input{width:100%;font-family:inherit;font-size:1.05rem;padding:12px 14px;border:1px solid var(--card-border);border-radius:10px;background:var(--surface);color:var(--ink);}
+  .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+  .chip{background:var(--card);border:1px solid var(--card-border);color:var(--ink-soft);border-radius:99px;padding:4px 11px;font-size:0.78rem;font-weight:500;}
+  .chip:hover{border-color:var(--gold);color:var(--heading);}
+  .sigla-err{color:var(--rust);font-size:0.88rem;margin:6px 0;}
+  .result-card{background:var(--surface);border:1px solid var(--card-border);border-radius:var(--radius);padding:18px 20px;font-family:'Source Serif 4',Georgia,serif;font-size:1.04rem;line-height:1.65;margin-bottom:16px;}
+  .bible-hint{font-size:0.78rem;color:var(--ink-soft);margin:0 0 10px;}
+
+  /* ---- "Powiększ": ramka rozwija się prawie na cały ekran (desktop) / na cały ekran jak osobny widok (telefon) ---- */
+  .reader-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,25,35,0.55);
+    z-index:998;
+    display:none;
+  }
+  .reader-backdrop.show{display:block;}
+  .inline-reader.is-fullscreen{
+    position:fixed;
+    z-index:999;
+    margin:0;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 24px 70px rgba(10,15,25,0.45);
+  }
+  .inline-reader.is-fullscreen .reader-body{
+    flex:1;
+    height:auto;
+    max-height:none;
+  }
+  @media (min-width:701px){
+    .inline-reader.is-fullscreen{
+      top:3vh; left:4vw; right:4vw; bottom:3vh;
+      border-radius:16px;
+      overflow:hidden;
+    }
+  }
+  @media (max-width:700px){
+    .inline-reader.is-fullscreen{
+      inset:0;
+      border-radius:0;
+    }
+  }
+  body.reader-fullscreen-lock{overflow:hidden;}
+  .inline-reader.is-fullscreen .expand-btn{display:none;}
+  .inline-reader.is-fullscreen .back-btn{display:inline-flex;}
+
+  /* ===================== SYNCHRONIZACJA: przycisk ręcznej synchronizacji ===================== */
+  #syncBtn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  #syncBtn.is-syncing{opacity:0.7;cursor:wait;}
+  #syncBtn .sync-spin{display:inline-block;animation:reader-spin 0.8s linear infinite;}
+
+  /* ===================== APP-LIKE MOBILE LAYOUT ===================== */
+  .tabbar{display:none;}
+  .app-page{scroll-snap-align:none;}
+
+  @media (max-width:700px){
+    html,body{height:100%;}
+    body{
+      overflow:hidden;
+      height:100dvh;
+      height:100vh;
+      padding-bottom:0;
+    }
+    #appContent{
+      display:flex;
+      flex-direction:column;
+      height:100dvh;
+      height:100vh;
+    }
+    header.top{
+      flex:0 0 auto;
+      margin-bottom:0;
+      border-bottom:1px solid var(--card-border);
+    }
+    .header-inner{
+      padding:14px 16px 12px;
+    }
+    .read-buttons{
+      margin-top:-8px;
+    }
+    .pages-scroller{
+      flex:1 1 auto;
+      min-height:0;
+      display:flex;
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .pages-scroller::-webkit-scrollbar{display:none;}
+    .app-page{
+      flex:0 0 100%;
+      max-width:100%;
+      width:100%;
+      height:100%;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-align:start;
+      scroll-snap-stop:always;
+    }
+    .app-page .wrap{
+      max-width:none;
+      padding:16px 16px 28px;
+    }
+    .app-page footer{
+      border-top:none;
+      margin-top:0;
+      padding-top:0;
+    }
+    .tabbar{
+      display:flex;
+      flex:0 0 auto;
+      border-top:1px solid var(--card-border);
+      background:var(--surface);
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+    .tab-btn{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      padding:8px 4px 7px;
+      background:none;
+      border:none;
+      color:var(--ink-soft);
+      font-size:0.66rem;
+      font-weight:600;
+      border-radius:0;
+    }
+    .tab-btn:active{transform:none;opacity:0.7;}
+    .tab-btn .icon{font-size:1.2rem;line-height:1;}
+    .tab-btn.active{color:var(--heading);}
+    .tab-btn.active .icon{transform:scale(1.08);}
+  }
+
+  /* ===================== DESKTOP / LAPTOP WEBSITE LAYOUT ===================== */
+  @media (min-width:701px){
+    :root{ --page-x: 40px; --page-max: 1120px; }
+
+    body{ background:var(--page-bg); }
+
+    header.top{
+      position:sticky;
+      top:0;
+      z-index:30;
+      background:var(--header-bg);
+      backdrop-filter:saturate(180%) blur(8px);
+      -webkit-backdrop-filter:saturate(180%) blur(8px);
+      border-bottom:1px solid var(--card-border);
+      margin-bottom:0;
+    }
+    .header-inner{
+      max-width:var(--page-max);
+      padding:14px var(--page-x);
+      align-items:center;
+    }
+    header.top h1{ font-size:1.2rem; }
+    header.top .sub{ display:none; }
+
+    .site-nav{
+      display:flex;
+      gap:2px;
+      background:var(--card);
+      padding:4px;
+      border-radius:12px;
+    }
+    .nav-link{
+      position:relative;
+      background:none;
+      border:none;
+      cursor:pointer;
+      font-family:'Inter',sans-serif;
+      font-weight:600;
+      font-size:0.86rem;
+      color:var(--ink-soft);
+      padding:8px 16px;
+      border-radius:9px;
+      transition:color .15s ease, background .15s ease;
+    }
+    .nav-link:hover{ color:var(--heading); }
+    .nav-link.active{
+      color:#fff;
+      background:var(--navy-dark);
+    }
+
+    /* body content: only one "page" visible at a time, styled like a normal site page */
+    .pages-scroller{
+      display:block;
+    }
+    .app-page{
+      display:none;
+      height:auto;
+      overflow:visible;
+    }
+    .app-page.is-active{
+      display:block;
+    }
+    .app-page .wrap{
+      max-width:var(--page-max);
+      margin:0 auto;
+      padding:44px var(--page-x) 80px;
+    }
+
+    /* page heading shown above each section's content, like a normal website */
+    .page-heading{
+      display:block;
+      font-family:'Source Serif 4',serif;
+      font-weight:700;
+      font-size:1.7rem;
+      color:var(--heading);
+      margin:0 0 22px;
+      letter-spacing:-0.01em;
+    }
+
+    /* nicer card polish for a "real website" feel */
+    .dash, .current-card, details.month, .util-bar button, footer{
+      box-shadow:0 1px 3px rgba(20,30,45,0.06);
+    }
+    .dash{ padding:26px 28px 22px; }
+    .current-card{ padding:28px 30px; }
+    .current-card h2{ font-size:1.5rem; }
+
+    .read-buttons{
+      grid-template-columns:1fr 1fr;
+      max-width:640px;
+      gap:14px;
+    }
+    .read-btn{ padding:18px 18px; border-radius:14px; }
+    .read-btn-icon{ width:44px; height:44px; font-size:1.4rem; }
+    .read-btn-label{ font-size:0.88rem; }
+    .read-btn-ref{ font-size:0.82rem; }
+
+    .dash-grid{
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      max-width:520px;
+    }
+
+    #monthsWrap{ max-width:820px; }
+
+    footer{
+      border-top:none;
+      background:var(--surface);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:18px 20px;
+      margin-top:8px;
+    }
+    .footer-util{ justify-content:flex-start; }
+  }
+
+  /* ===== biblia.html jako podstrona: zwykłe przewijanie strony, bez dolnego paska i poziomych "stron" ===== */
+  html,body{height:auto !important;}
+  body{overflow:auto !important;padding-bottom:48px;}
+  body.reader-fullscreen-lock{overflow:hidden !important;}
+  header.top .header-inner{align-items:center;}
+  .top-actions{display:flex;gap:8px;align-items:center;}
+  .top-btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:0.85rem;
+    background:var(--surface);color:var(--heading);
+    border:1px solid var(--card-border);border-radius:10px;
+    padding:8px 14px;cursor:pointer;
+  }
+  .top-btn:hover{border-color:var(--gold);}
+  .top-btn.primary{background:var(--navy-dark);color:#fff;border-color:var(--navy-dark);}
+  main.wrap{max-width:820px;margin:0 auto;padding:4px 16px 28px;}
+  @media (min-width:701px){ main.wrap{max-width:var(--page-max,1120px);padding:32px var(--page-x,40px) 80px;} }
+</style>
+<script>
+  (function(){
+    try{
+      if(localStorage.getItem('biblePlanTheme_v1') === 'dark'){
+        document.documentElement.classList.add('theme-dark');
+      }
+    }catch(e){}
+  })();
+</script>
+</head>
+<body>
+
+<header class="top">
+  <div class="header-inner">
+    <div class="brand"><h1>📖 Biblia</h1></div>
+    <div class="top-actions">
+      <button id="themeToggleBtn" class="top-btn" type="button">🌙 Ciemny motyw</button>
+      <a href="index.html" id="toSkrzynka" style="text-decoration:none"><button class="top-btn primary" type="button">Skrzynka</button></a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="sub-tabs" role="tablist">
+    <button class="sub-tab active" data-sub="bs-sigla" type="button">🔎 Wpisz sigla</button>
+    <button class="sub-tab" data-sub="bs-czytaj" type="button">📖 Księgi i rozdziały</button>
+    <button class="sub-tab" data-sub="bs-los" type="button">🎲 Wylosuj cytat</button>
+  </div>
+
+  <div class="bible-panel" id="bs-sigla">
+    <input type="text" class="sigla-input" id="siglaIn" placeholder="np. J 3,16 · Mt 5,3-12 · Flp 4,4-7.13 · Ps 23" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Sigla">
+    <div class="chip-row" id="siglaExamples"></div>
+    <div id="siglaErr"></div>
+    <div class="result-card" id="siglaOut" hidden></div>
+    <p class="bible-hint">Rozumiem zapis polski (J 3,16) i angielski (J 3:16), przedziały (1,1-2,4), pojedyncze wersety po kropce (4,4-7.13), kilka odnośników po średniku oraz pełne nazwy ksiąg.</p>
+  </div>
+
+  <div class="bible-panel" id="bs-czytaj" hidden>
+    <section class="dash">
+      <div class="settings-row" style="margin-top:0;padding-top:0;border-top:none;">
+        <label for="bibleBookSelect">Księga:</label>
+        <select id="bibleBookSelect"></select>
+        <label for="bibleChapterSelect">Rozdział:</label>
+        <select id="bibleChapterSelect"></select>
+      </div>
+    </section>
+    <p class="bible-hint">Strzałki ‹ › w nagłówku (lub ← → na klawiaturze) przechodzą do poprzedniego i następnego rozdziału.</p>
+    <section class="inline-reader" id="bibleInlineReader">
+      <div class="reader-head">
+        <span class="reader-title" id="bibleReaderTitle"></span>
+        <span class="reader-head-actions">
+          <button id="biblePrevBtn" type="button" aria-label="Poprzedni rozdział">‹</button>
+          <button id="bibleNextBtn" type="button" aria-label="Następny rozdział">›</button>
+          <button class="expand-btn" id="bibleReaderExpandBtn" type="button">🔍 Powiększ</button>
+          <button class="back-btn" id="bibleReaderBackBtn" type="button">‹ POWRÓT</button>
+        </span>
+      </div>
+      <div class="reader-body">
+        <div class="reader-text" id="bibleReaderText"></div>
+      </div>
+    </section>
+    <div class="reader-backdrop" id="bibleReaderBackdrop"></div>
+  </div>
+
+  <div class="bible-panel" id="bs-los" hidden>
+    <section class="dash">
+      <div class="settings-row" style="margin-top:0;padding-top:0;border-top:none;">
+        <label for="quoteScope">Losuj z:</label>
+        <select id="quoteScope">
+          <option value="all">Całej Biblii</option>
+          <option value="st">Starego Testamentu</option>
+          <option value="nt">Nowego Testamentu</option>
+        </select>
+        <button id="quoteBtn" type="button" class="btn-primary">🎲 Wylosuj cytat</button>
+      </div>
+    </section>
+    <section class="dash quote-card" id="quoteCard"><p class="reader-hint">Kliknij „Wylosuj cytat”, aby zobaczyć losowy werset.</p></section>
+    <div class="util-bar" id="quoteActions" hidden>
+      <button id="quoteCopyBtn" type="button">Kopiuj</button>
+      <button id="quoteContextBtn" type="button">Czytaj w kontekście →</button>
+    </div>
+  </div>
+</main>
+
+<script src="biblia.js" defer></script>
+<script type="module">
+/* ================= BIBLIA: tekst czytany z pliku biblia.js =================
+   Plik biblia.js (leżący obok index.html) definiuje tablicę BIBLIA:
+   [{k:'rdz', n:'Księga Rodzaju', r:[ [werset1, werset2, ...], ...rozdziały ]}, ...]
+   Żadne dane nie są już pobierane z zewnętrznych stron. */
+const BIB = (typeof BIBLIA !== 'undefined') ? BIBLIA : null;
+const BIB_ERR = 'Nie znaleziono pliku biblia.js. Umieść go w tym samym folderze co index.html i odśwież stronę.';
+const BIB_SOURCE = 'Tekst: Edycja Świętego Pawła, Internetowa Biblia 2000 NG — © 1998–2023 by Digital Gospel';
+const NT_START = BIB ? BIB.findIndex(b => b.k === 'mt') : 0;
+
+function mk(tag, cls, text){
+  const e = document.createElement(tag);
+  if(cls) e.className = cls;
+  if(text != null) e.textContent = text;
+  return e;
+}
+
+/* Ostatni werset każdego rozdziału ma w pliku doklejoną stopkę z odnośnikiem
+   i prawami autorskimi — obcinamy ją z wyświetlanego tekstu. */
+const bibChapterCache = new Map();
+function chapterVerses(bi, ci){
+  const key = bi * 1000 + ci;
+  let v = bibChapterCache.get(key);
+  if(!v){
+    const b = BIB[bi];
+    v = b.r[ci].slice();
+    const i = v.length - 1;
+    let t = v[i];
+    const p = t.lastIndexOf(' ' + b.n + ' ' + (ci + 1) + ':1-');
+    t = p >= 0 ? t.slice(0, p) : t.replace(/(?:\s\S+){0,4}\s\d+:1-\d+,\s*Edycja.*$/u, '');
+    v[i] = t.trim();
+    bibChapterCache.set(key, v);
+  }
+  return v;
+}
+function bibRefLabel(bi, c, from, to, whole){
+  return BIB[bi].n + ' ' + c + (whole ? '' : ',' + from + (to > from ? '-' + to : ''));
+}
+function appendVerses(box, bi, c, from, to, hl){
+  const v = chapterVerses(bi, c - 1);
+  for(let n = from; n <= Math.min(to, v.length); n++){
+    const p = mk('p', 'verse' + (n === hl ? ' hl' : ''));
+    p.append(mk('sup', null, n), v[n - 1]);
+    box.appendChild(p);
+  }
+}
+function appendSource(box){ box.appendChild(mk('p', 'source-note', BIB_SOURCE)); }
+
+function copyText(text, btn){
+  const done = () => { const o = btn.textContent; btn.textContent = 'Skopiowano ✓'; setTimeout(() => btn.textContent = o, 1200); };
+  const fallback = () => {
+    const a = document.createElement('textarea');
+    a.value = text; document.body.appendChild(a); a.select();
+    try{ document.execCommand('copy'); done(); }catch(e){}
+    a.remove();
+  };
+  if(navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
+  else fallback();
+}
+
+/* ---------- parser sigli: "J 3,16", "Mt 5,3-12", "Flp 4,4-7.13", "Ps 23", "Rdz 1,1-2,4", "J 3,16; Rz 8,28" ---------- */
+const bibFold = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/[^a-z0-9]/g, '');
+const BIB_ALIAS = { ne:'neh', so:'sof', hb:'hbr', mat:'mt', mar:'mk', luk:'lk', jan:'j' };
+const BIB_IDX = BIB ? BIB.map((b, i) => ({ i, k: bibFold(b.k), n: bibFold(b.n) })) : [];
+
+function findBook(txt){
+  let f = bibFold(txt);
+  if(!f) return [];
+  f = BIB_ALIAS[f] || f;
+  const ex = BIB_IDX.find(x => x.k === f || x.n === f);
+  if(ex) return [ex.i];
+  return BIB_IDX.filter(x => x.k.startsWith(f) || (f.length >= 3 && x.n.includes(f))).map(x => x.i);
+}
+function fmtMissing(arr){
+  return arr.length === 1 ? String(arr[0]) : arr[0] + '–' + arr[arr.length - 1];
+}
+function parseOneRef(bi, rest, out, notes, lenient){
+  const B = BIB[bi], N = B.r.length;
+  const chk = c => {
+    if(c < 1 || c > N) throw new Error(B.n + ' ma tylko ' + N + ' rozdz. (podano ' + c + ').');
+    return c;
+  };
+  const add = (c, from, to) => {
+    const L = B.r[c - 1].length;
+    if(to < from) throw new Error('Odwrócony przedział w „' + rest + '”.');
+    if(from > L) throw new Error(B.n + ' ' + c + ' ma tylko ' + L + ' wersetów (podano ' + from + ').');
+    out.push({ bi, c, from: Math.max(1, from), to: Math.min(to, L), whole: from <= 1 && to >= L });
+  };
+  rest = rest.replace(/(nn?|i?nast)\.?$/i, '');
+
+  if(!rest.includes(',')){
+    const m = rest.match(/^(\d+)(?:-(\d+))?$/);
+    if(!m) throw new Error('Nie rozumiem zapisu „' + rest + '”.');
+    const a = +m[1], b = m[2] ? +m[2] : a;
+    if(b < a) throw new Error('Odwrócony przedział rozdziałów.');
+    if(!lenient){ chk(a); chk(b); }
+    const missing = [];
+    for(let c = a; c <= b; c++){
+      if(c > N) missing.push(c); else add(c, 1, 1e9);
+    }
+    if(missing.length) notes.push('W tej edycji tekstu ' + B.n + ' ma ' + N + ' rozdz. — brak rozdz. ' + fmtMissing(missing) + '.');
+    return;
+  }
+  const m = rest.match(/^(\d+),(.+)$/);
+  let c = chk(+m[1]), p;
+  for(const part of m[2].split('.')){
+    if(p = part.match(/^(\d+)$/)) add(c, +p[1], +p[1]);
+    else if(p = part.match(/^(\d+)-(\d+)$/)) add(c, +p[1], +p[2]);
+    else if(p = part.match(/^(\d+)-(\d+),(\d+)$/)){
+      const c2 = chk(+p[2]);
+      if(c2 <= c) throw new Error('Odwrócony przedział w „' + rest + '”.');
+      add(c, +p[1], 1e9);
+      for(let k = c + 1; k < c2; k++) add(k, 1, 1e9);
+      add(c2, 1, +p[3]);
+      c = c2;
+    }
+    else if(p = part.match(/^(\d+),(\d+)(?:-(\d+))?$/)){ c = chk(+p[1]); add(c, +p[2], +(p[3] || p[2])); }
+    else throw new Error('Nie rozumiem zapisu „' + rest + '”.');
+  }
+}
+function parseRefs(input, opts){
+  const lenient = !!(opts && opts.lenient);
+  const out = [], err = [], notes = [];
+  let cur = null;
+  for(let seg of input.split(/[;\n]+/)){
+    seg = seg.trim();
+    if(!seg) continue;
+    const lead = seg.match(/^[1-3]\s*\.?\s*(?=\p{L})/u), i = lead ? lead[0].length : 0;
+    let j = seg.slice(i).search(/\d/);
+    j = j < 0 ? seg.length : i + j;
+    const bp = seg.slice(0, j).trim();
+    let rest = seg.slice(j);
+    if(bp){
+      const r = findBook(bp);
+      if(!r.length){ err.push('Nie znam księgi „' + bp + '”.'); continue; }
+      if(r.length > 1){ err.push('„' + bp + '” — czy chodzi o: ' + r.slice(0, 6).map(x => BIB[x].n).join(', ') + '?'); continue; }
+      cur = r[0];
+    } else if(cur === null){ err.push('Brak nazwy księgi przy „' + seg + '”.'); continue; }
+    rest = rest.replace(/\s+/g, '').replace(/[–—]/g, '-').replace(/:/g, ',');
+    if(!rest){ err.push('Podaj rozdział po „' + BIB[cur].n + '”.'); continue; }
+    try{ parseOneRef(cur, rest, out, notes, lenient); }catch(e){ err.push(e.message); }
+  }
+  return { out, err, notes };
+}
+/* Rysuje listę fragmentów (nagłówek + wersety). decorate(seg, headEl, wrapEl) — opcjonalne przyciski. */
+function renderSegs(box, segs, decorate){
+  segs.forEach(s => {
+    const wrap = mk('div', 'verse-seg');
+    const head = mk('h3', 'verse-head');
+    head.appendChild(mk('span', null, bibRefLabel(s.bi, s.c, s.from, s.to, s.whole)));
+    wrap.appendChild(head);
+    appendVerses(wrap, s.bi, s.c, s.from, s.to);
+    if(decorate) decorate(s, head, wrap);
+    box.appendChild(wrap);
+  });
+}
+function wireFullscreen(readerEl, expandBtn, backBtn, backdrop){
+  const set = on => {
+    readerEl.classList.toggle('is-fullscreen', on);
+    backdrop.classList.toggle('show', on);
+    document.body.classList.toggle('reader-fullscreen-lock', on);
+  };
+  expandBtn.addEventListener('click', () => set(true));
+  backBtn.addEventListener('click', () => set(false));
+  backdrop.addEventListener('click', () => set(false));
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && readerEl.classList.contains('is-fullscreen')) set(false);
+  });
+}
+
+/* ================= ZAKŁADKA „BIBLIA”: losowanie / księgi i rozdziały / sigla ================= */
+const bibleSubTabs = Array.from(document.querySelectorAll('.sub-tab'));
+function showBibleSub(id){
+  bibleSubTabs.forEach(b => b.classList.toggle('active', b.dataset.sub === id));
+  document.querySelectorAll('.bible-panel').forEach(p => { p.hidden = p.id !== id; });
+}
+bibleSubTabs.forEach(b => b.addEventListener('click', () => showBibleSub(b.dataset.sub)));
+
+const bibleBookSelect = document.getElementById('bibleBookSelect');
+const bibleChapterSelect = document.getElementById('bibleChapterSelect');
+const bibleReaderText = document.getElementById('bibleReaderText');
+const bibleReaderTitle = document.getElementById('bibleReaderTitle');
+const biblePrevBtn = document.getElementById('biblePrevBtn');
+const bibleNextBtn = document.getElementById('bibleNextBtn');
+const bibleCur = { bi: 0, ci: 0 };
+
+wireFullscreen(
+  document.getElementById('bibleInlineReader'),
+  document.getElementById('bibleReaderExpandBtn'),
+  document.getElementById('bibleReaderBackBtn'),
+  document.getElementById('bibleReaderBackdrop')
+);
+
+function fillChapterSelect(){
+  bibleChapterSelect.replaceChildren();
+  for(let i = 1; i <= BIB[bibleCur.bi].r.length; i++){
+    const o = mk('option', null, i); o.value = i - 1; bibleChapterSelect.appendChild(o);
+  }
+}
+function showChapter(bi, ci, hl){
+  if(bi !== bibleCur.bi || !bibleChapterSelect.options.length){ bibleCur.bi = bi; fillChapterSelect(); }
+  bibleCur.ci = ci;
+  bibleBookSelect.value = bi;
+  bibleChapterSelect.value = ci;
+  bibleReaderTitle.textContent = BIB[bi].n + ' ' + (ci + 1);
+  bibleReaderText.replaceChildren();
+  appendVerses(bibleReaderText, bi, ci + 1, 1, 1e9, hl);
+  appendSource(bibleReaderText);
+  biblePrevBtn.disabled = bi === 0 && ci === 0;
+  bibleNextBtn.disabled = bi === BIB.length - 1 && ci === BIB[bi].r.length - 1;
+  const hlEl = bibleReaderText.querySelector('.hl');
+  if(hlEl) hlEl.scrollIntoView({ block: 'center' }); else bibleReaderText.scrollTop = 0;
+}
+function stepChapter(d){
+  let { bi, ci } = bibleCur;
+  ci += d;
+  if(ci < 0){ if(bi === 0) return; bi--; ci = BIB[bi].r.length - 1; }
+  else if(ci >= BIB[bi].r.length){ if(bi === BIB.length - 1) return; bi++; ci = 0; }
+  showChapter(bi, ci);
+}
+function openInChapterTab(bi, ci, verse){
+  showBibleSub('bs-czytaj');
+  showChapter(bi, ci, verse);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function initBibleUI(){
+  if(!BIB){
+    ['quoteCard', 'bibleReaderText', 'siglaOut'].forEach(id => {
+      const el = document.getElementById(id);
+      el.replaceChildren(mk('p', 'reader-note', BIB_ERR));
+      el.hidden = false;
+    });
+    return;
+  }
+
+  /* --- 1. Wylosuj cytat --- */
+  let totals = null, lastQuote = null;
+  const quoteCard = document.getElementById('quoteCard');
+  const quoteActions = document.getElementById('quoteActions');
+  function randomQuote(){
+    if(!totals) totals = BIB.map(b => b.r.reduce((s, ch) => s + ch.length, 0));
+    const scope = document.getElementById('quoteScope').value;
+    const lo = scope === 'nt' ? NT_START : 0, hi = scope === 'st' ? NT_START : BIB.length;
+    let sum = 0;
+    for(let i = lo; i < hi; i++) sum += totals[i];
+    let r = Math.floor(Math.random() * sum), bi = lo;
+    while(r >= totals[bi]){ r -= totals[bi]; bi++; }
+    let ci = 0;
+    while(r >= BIB[bi].r[ci].length){ r -= BIB[bi].r[ci].length; ci++; }
+    lastQuote = { bi, ci, v: r + 1, text: chapterVerses(bi, ci)[r] };
+    quoteCard.replaceChildren(
+      mk('blockquote', 'quote-text', '„' + lastQuote.text + '”'),
+      mk('cite', 'quote-cite', bibRefLabel(bi, ci + 1, r + 1, r + 1))
+    );
+    quoteActions.hidden = false;
+  }
+  document.getElementById('quoteBtn').addEventListener('click', randomQuote);
+  document.getElementById('quoteCopyBtn').addEventListener('click', e => {
+    if(lastQuote) copyText('„' + lastQuote.text + '” — ' + bibRefLabel(lastQuote.bi, lastQuote.ci + 1, lastQuote.v, lastQuote.v), e.currentTarget);
+  });
+  document.getElementById('quoteContextBtn').addEventListener('click', () => {
+    if(lastQuote) openInChapterTab(lastQuote.bi, lastQuote.ci, lastQuote.v);
+  });
+
+  /* --- 2. Księga i rozdział + strzałki --- */
+  [['Stary Testament', 0, NT_START], ['Nowy Testament', NT_START, BIB.length]].forEach(([label, a, b]) => {
+    const g = document.createElement('optgroup');
+    g.label = label;
+    for(let i = a; i < b; i++){ const o = mk('option', null, BIB[i].n); o.value = i; g.appendChild(o); }
+    bibleBookSelect.appendChild(g);
+  });
+  bibleBookSelect.addEventListener('change', () => showChapter(+bibleBookSelect.value, 0));
+  bibleChapterSelect.addEventListener('change', () => showChapter(bibleCur.bi, +bibleChapterSelect.value));
+  biblePrevBtn.addEventListener('click', () => stepChapter(-1));
+  bibleNextBtn.addEventListener('click', () => stepChapter(1));
+  document.addEventListener('keydown', e => {
+    if(e.altKey || e.ctrlKey || e.metaKey) return;
+    if(/^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if(document.getElementById('bs-czytaj').hidden) return;
+    if(e.key === 'ArrowLeft'){ stepChapter(-1); e.preventDefault(); }
+    if(e.key === 'ArrowRight'){ stepChapter(1); e.preventDefault(); }
+  });
+  showChapter(0, 0);
+
+  /* --- 3. Wpisz sigla --- */
+  const siglaIn = document.getElementById('siglaIn');
+  const siglaOut = document.getElementById('siglaOut');
+  const siglaErr = document.getElementById('siglaErr');
+  function renderSigla(){
+    siglaOut.replaceChildren();
+    siglaErr.replaceChildren();
+    if(!siglaIn.value.trim()){ siglaOut.hidden = true; return; }
+    const { out, err } = parseRefs(siglaIn.value);
+    err.forEach(m => siglaErr.appendChild(mk('div', 'sigla-err', m)));
+    siglaOut.hidden = !out.length;
+    renderSegs(siglaOut, out, (s, head, wrap) => {
+      const actions = mk('span', 'verse-actions');
+      const copyBtn = mk('button', 'mini', 'Kopiuj');
+      copyBtn.type = 'button';
+      copyBtn.addEventListener('click', () => {
+        const label = head.firstChild.textContent;
+        const text = Array.from(wrap.querySelectorAll('.verse')).map(p => p.textContent).join(' ');
+        copyText(label + '\n' + text, copyBtn);
+      });
+      const openBtn = mk('button', 'mini', 'Otwórz rozdział');
+      openBtn.type = 'button';
+      openBtn.addEventListener('click', () => openInChapterTab(s.bi, s.c - 1, s.from));
+      actions.append(copyBtn, openBtn);
+      head.appendChild(actions);
+    });
+    if(out.length) appendSource(siglaOut);
+  }
+  let siglaTimer = null;
+  siglaIn.addEventListener('input', () => { clearTimeout(siglaTimer); siglaTimer = setTimeout(renderSigla, 150); });
+  const chips = document.getElementById('siglaExamples');
+  ['J 3,16', 'Rdz 1,1-5', 'Mt 5,3-12', 'Flp 4,4-7.13', '1 Kor 13,4-7', 'Ps 23', 'Rdz 1,1-2,4', 'J 3,16; Rz 8,28'].forEach(x => {
+    const c = mk('button', 'chip', x);
+    c.type = 'button';
+    c.addEventListener('click', () => { siglaIn.value = x; renderSigla(); });
+    chips.appendChild(c);
+  });
+}
+initBibleUI();
+
+initBibleUI();
+showBibleSub('bs-sigla');
+
+const THEME_KEY = 'biblePlanTheme_v1';
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+function applyTheme(theme){
+  document.documentElement.classList.toggle('theme-dark', theme === 'dark');
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Jasny motyw' : '🌙 Ciemny motyw';
+  if(themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#0f151b' : '#152a3e');
+}
+let currentTheme = 'light';
+try{ currentTheme = localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'; }catch(e){}
+applyTheme(currentTheme);
+themeToggleBtn.onclick = () => {
+  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  try{ localStorage.setItem(THEME_KEY, currentTheme); }catch(e){}
+  applyTheme(currentTheme);
+};
+
+</script>
+</body>
+</html>
