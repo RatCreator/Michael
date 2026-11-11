@@ -4,12 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#1a1a2e">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Biblia">
 <title>Czytnik Biblii</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,7 +26,6 @@ select:focus,input:focus,button:focus-visible{outline:2px solid var(--gold);outl
 nav{display:flex;gap:26px;border-bottom:1px solid var(--line);margin:18px 0 26px;overflow-x:auto}
 nav button{background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);font-family:var(--serif);font-size:1.1rem;padding:10px 0;cursor:pointer;white-space:nowrap;margin-bottom:-1px}
 nav button[aria-selected=true]{color:var(--gold);border-bottom-color:var(--gold)}
-nav .n{font-family:var(--sans);font-size:.75rem;background:var(--gold);color:var(--bg);border-radius:20px;padding:1px 7px;margin-left:6px}
 .panel[hidden]{display:none}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 #q{flex:1;min-width:200px;font-size:1.05rem}
@@ -48,12 +41,8 @@ nav .n{font-family:var(--sans);font-size:.75rem;background:var(--gold);color:var
 .ch h3{font-family:var(--sans);font-size:.85rem;font-weight:500;color:var(--mute);margin:22px 0 6px}
 .txt{font-size:1.22rem;line-height:1.95;margin:0;max-width:68ch}
 .txt[dir=rtl]{font-size:1.7rem;line-height:2.5;max-width:none}
-.card .txt[dir=rtl]{font-size:1.45rem;line-height:2.3}
 .v{border-radius:4px;padding:1px 0;transition:background .15s}
-.v.on{background:var(--gold-bg);box-shadow:0 1px 0 var(--gold)}
-.v sup{font-family:var(--sans);font-size:.62em;color:var(--gold);margin:0 3px 0 2px;font-weight:600;cursor:pointer;padding:3px 6px;border-radius:6px}
-.v sup:hover{background:var(--gold-bg)}
-.v.on sup{background:var(--gold);color:var(--bg)}
+.v sup{font-family:var(--sans);font-size:.62em;color:var(--gold);margin:0 3px 0 2px;font-weight:600}
 .w{cursor:pointer;border-radius:5px;transition:background .15s,color .15s}
 .w:hover{background:rgba(212,176,106,.16);color:#fff}
 .w.act{background:var(--gold-bg);box-shadow:0 1px 0 var(--gold)}
@@ -71,20 +60,15 @@ nav .n{font-family:var(--sans);font-size:.75rem;background:var(--gold);color:var
 .tip dd{margin:2px 0 0}
 .tip .fun{background:rgba(212,176,106,.1);border-left:2px solid var(--gold);padding:6px 10px;border-radius:0 8px 8px 0}
 .tip .src{margin-top:10px;font-size:.68rem}
+.tip .ctx{line-height:1.55}
+.tip .ctx .g{color:var(--mute)}
+.tip .ctx mark{background:var(--gold-bg);color:var(--gold);box-shadow:0 1px 0 var(--gold);border-radius:3px;padding:0 2px;font-weight:600}
+.tip .ctx small{display:block;margin-top:4px;font-size:.68rem;color:var(--mute)}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}}
 .err{font-family:var(--sans);background:rgba(200,90,90,.12);border:1px solid rgba(200,90,90,.4);border-radius:10px;padding:14px 16px;line-height:1.6;font-size:.92rem}
 .muted{color:var(--mute);font-family:var(--sans)}
 .pick{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center}
 .pick .nav2{display:flex;gap:8px;grid-column:1/-1}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
-.card h4{margin:0;color:var(--gold);font-size:1.25rem;font-weight:500}
-.card .meta{font-family:var(--sans);font-size:.78rem;color:var(--mute);margin:2px 0 10px}
-.card .txt{font-size:1.1rem;line-height:1.85}
-.card .acts{display:flex;gap:8px;margin-top:14px}
-.bar{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--gold);border-radius:40px;padding:8px 10px 8px 20px;display:flex;align-items:center;gap:12px;font-family:var(--sans);font-size:.9rem;box-shadow:0 10px 30px rgba(0,0,0,.45);z-index:5;white-space:nowrap}
-.bar[hidden]{display:none}
-.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:var(--gold);color:#1a1a2e;font-family:var(--sans);font-weight:600;padding:9px 20px;border-radius:30px;z-index:9;opacity:0;pointer-events:none;transition:opacity .25s}
-.toast.show{opacity:1}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 @media (max-width:520px){.ver{margin-left:0;width:100%}.ref{font-size:1.5rem}.txt{font-size:1.1rem}}
 </style>
@@ -93,14 +77,12 @@ nav .n{font-family:var(--sans);font-size:.75rem;background:var(--gold);color:var
 <div class="wrap">
   <header>
     <div class="logo" aria-hidden="true">א</div>
-    <h1>Czytnik Biblii<small>Biblia hebrajska: szukaj po siglach, czytaj rozdziałami, zapisuj fragmenty</small></h1>
-    <div class="ver">Hebrajski · Westminster Leningrad Codex</div>
+    <h1>Czytnik Biblii</h1>
   </header>
 
   <nav role="tablist">
     <button role="tab" aria-selected="true" data-tab="t1">Wyszukaj fragment</button>
     <button role="tab" aria-selected="false" data-tab="t2">Księgi i rozdziały</button>
-    <button role="tab" aria-selected="false" data-tab="t3">Zapisane<span class="n" id="cnt" hidden>0</span></button>
   </nav>
 
   <section class="panel" id="t1">
@@ -124,18 +106,9 @@ nav .n{font-family:var(--sans);font-size:.75rem;background:var(--gold);color:var
     <div class="out" id="rd"></div>
   </section>
 
-  <section class="panel" id="t3" hidden>
-    <div id="saved"></div>
-  </section>
   <p class="hint" style="margin-top:44px">Przekład: Westminster Leningrad Codex (tekst masorecki, układ ksiąg jak w Biblii katolickiej, numeracja rozdziałów i psalmów hebrajska, jak w Biblii Tysiąclecia). Tekstu hebrajskiego nie ma dla ksiąg deuterokanonicznych (Tb, Jdt, 1–2 Mch, Mdr, Syr, Ba), dodatków do Est i Dn ani dla Nowego Testamentu.</p>
 </div>
 
-<div class="bar" id="bar" hidden>
-  <span id="selc"></span>
-  <button class="btn sm" id="save">Zapisz</button>
-  <button class="btn ghost sm" id="clr">Wyczyść</button>
-</div>
-<div class="toast" id="toast" role="status"></div>
 
 <script>
 const API=["https://cdn.jsdelivr.net/gh/wldeh/bible-api/bibles/he-wlc","https://raw.githubusercontent.com/wldeh/bible-api/main/bibles/he-wlc"];
@@ -183,8 +156,7 @@ Ml|Księga Malachiasza|malachi|3|3`.split("\n").map((l,i)=>{const[a,n,s,c,t]=l.s
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const norm=s=>s.toLowerCase().replace(/ł/g,"l").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\s.]/g,"");
-const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const S={ver:"Hebrajski (WLC)",sel:new Map(),saved:store.get("biblia-zapisane",[]),b:0,c:1,init2:false};
+const S={ver:"Hebrajski (WLC)",b:0,c:1,init2:false};
 const cache=new Map(),slugs={};
 
 /* ---------- API ---------- */
@@ -264,8 +236,7 @@ async function resolve(p){
 /* ---------- Render ---------- */
 const isRtl=t=>/[\u0590-\u05FF\u0600-\u06FF]/.test(t||"");
 function vHTML(b,c,v){
-  const k=`${b.i}:${c}:${v.v}`;
-  return `<span class="v${S.sel.has(k)?" on":""}" data-k="${k}" data-b="${b.i}" data-c="${c}" data-v="${v.v}" data-t="${esc(v.t)}"><sup>${v.v}</sup>${wHTML(v.t)}</span>`;
+  return `<span class="v" data-b="${b.i}" data-c="${c}" data-v="${v.v}" data-t="${esc(v.t)}"><sup>${v.v}</sup>${wHTML(v.t)}</span>`;
 }
 function secsHTML(b,secs){
   return secs.map(s=>`<div class="ch">${secs.length>1?`<h3>${esc(b.a)} ${s.c}</h3>`:""}<p class="txt" dir="rtl" lang="he">${s.verses.map(v=>vHTML(b,s.c,v)).join(" ")}</p></div>`).join("");
@@ -281,7 +252,7 @@ async function search(manual){
   if(manual===true||!out.innerHTML)out.innerHTML=loading;
   try{
     const secs=await resolve(p);if(my!==st)return;hideTip();
-    out.innerHTML=`<h2 class="ref">${esc(p.book.a)} ${esc(p.rest)}</h2><p class="sub">${esc(p.book.n)} · ${esc(S.ver)} · kliknij numer wersetu, aby go zaznaczyć, a słowo, aby zobaczyć tłumaczenie</p>`+secsHTML(p.book,secs);
+    out.innerHTML=`<h2 class="ref">${esc(p.book.a)} ${esc(p.rest)}</h2><p class="sub">${esc(p.book.n)} · kliknij słowo, aby zobaczyć jego tłumaczenie</p>`+secsHTML(p.book,secs);
   }catch(e){if(my===st)out.innerHTML=errHTML(e.message)}
 }
 
@@ -299,7 +270,7 @@ async function loadReader(){
   const b=B[S.b],out=$("rd");out.innerHTML=loading;hideTip();
   try{
     const ch=await getChapter(b,S.c);
-    out.innerHTML=`<h2 class="ref">${esc(b.n)} ${S.c}</h2><p class="sub">${esc(S.ver)} · kliknij numer wersetu, aby go zaznaczyć, a słowo, aby zobaczyć tłumaczenie</p>`+secsHTML(b,[{c:S.c,verses:ch}]);
+    out.innerHTML=`<h2 class="ref">${esc(b.n)} ${S.c}</h2><p class="sub">kliknij słowo, aby zobaczyć jego tłumaczenie</p>`+secsHTML(b,[{c:S.c,verses:ch}]);
   }catch(e){out.innerHTML=errHTML(e.message)}
 }
 function step(d){
@@ -309,54 +280,10 @@ function step(d){
   S.b=b;S.c=c;$("book").value=b;fillChaps();loadReader();scrollTo({top:0,behavior:"smooth"});
 }
 
-/* ---------- Zaznaczanie i zapis ---------- */
-function updBar(){
-  const n=S.sel.size;$("bar").hidden=!n;
-  $("selc").textContent=n+(n===1?" werset":n<5?" wersety":" wersetów");
-}
-function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1600)}
 document.addEventListener("click",e=>{
   const w=e.target.closest(".w");
   if(w){showTip(w);return}
-  if(e.target.closest(".tip"))return;
-  hideTip();
-  const el=e.target.closest(".v");if(!el||el.closest("#saved")||!e.target.closest("sup"))return;
-  const k=el.dataset.k;
-  if(S.sel.has(k)){S.sel.delete(k);el.classList.remove("on")}
-  else{S.sel.set(k,{b:+el.dataset.b,c:+el.dataset.c,v:+el.dataset.v,t:el.dataset.t});el.classList.add("on")}
-  updBar();
-});
-function refOf(items){
-  const by={};items.forEach(x=>(by[x.c]=by[x.c]||[]).push(x.v));
-  return Object.keys(by).map(Number).sort((a,b)=>a-b).map(c=>{
-    const vs=[...new Set(by[c])].sort((a,b)=>a-b),parts=[];let s=vs[0],p=s;
-    for(let i=1;i<=vs.length;i++){if(vs[i]===p+1){p=vs[i];continue}parts.push(s===p?s:s+"-"+p);s=vs[i];p=s}
-    return c+","+parts.join(".");
-  }).join("; ");
-}
-function clearSel(){S.sel.clear();document.querySelectorAll(".v.on").forEach(e=>e.classList.remove("on"));updBar()}
-function saveSel(){
-  const groups={};
-  [...S.sel.values()].forEach(x=>(groups[x.b]=groups[x.b]||[]).push(x));
-  Object.keys(groups).map(Number).sort((a,b)=>b-a).forEach(bi=>{
-    const items=groups[bi].sort((p,q)=>p.c-q.c||p.v-q.v);
-    S.saved.unshift({id:Date.now()+"-"+bi,ref:B[bi].a+" "+refOf(items),ver:S.ver,v:items.map(({c,v,t})=>({c,v,t}))});
-  });
-  store.set("biblia-zapisane",S.saved);
-  clearSel();renderSaved();toast("Zapisano");
-}
-function renderSaved(){
-  const c=S.saved.length;$("cnt").hidden=!c;$("cnt").textContent=c;
-  $("saved").innerHTML=c?S.saved.map(s=>`<article class="card"><h4>${esc(s.ref)}</h4><div class="meta">${esc(s.ver)}</div><p class="txt" dir="rtl" lang="he">${s.v.map(v=>`<span class="v"><sup>${v.v}</sup>${wHTML(v.t)}</span>`).join(" ")}</p><div class="acts"><button class="btn ghost sm" data-copy="${s.id}">Kopiuj</button><button class="btn ghost sm" data-del="${s.id}">Usuń</button></div></article>`).join(""):'<p class="muted">Nic tu jeszcze nie ma. Zaznacz wersety w pierwszej lub drugiej zakładce i wybierz Zapisz.</p>';
-}
-$("saved").addEventListener("click",async e=>{
-  const d=e.target.dataset;
-  if(d.del){S.saved=S.saved.filter(s=>s.id!==d.del);store.set("biblia-zapisane",S.saved);renderSaved()}
-  if(d.copy){
-    const s=S.saved.find(x=>x.id===d.copy);
-    const txt=`${s.ref} (${s.ver})\n`+s.v.map(v=>`${v.v} ${v.t}`).join("\n");
-    try{await navigator.clipboard.writeText(txt);toast("Skopiowano")}catch(err){toast("Nie udało się skopiować")}
-  }
+  if(!e.target.closest(".tip"))hideTip();
 });
 
 /* ---------- Zakładki i start ---------- */
@@ -373,9 +300,6 @@ document.querySelector(".hint").addEventListener("click",e=>{if(e.target.dataset
 $("book").onchange=e=>{S.b=+e.target.value;S.c=1;fillChaps();loadReader()};
 $("chap").onchange=e=>{S.c=+e.target.value;loadReader()};
 $("prev").onclick=()=>step(-1);$("next").onclick=()=>step(1);
-$("save").onclick=saveSel;$("clr").onclick=clearSel;
-renderSaved();
-if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
 /* ---------- Słownik (dymek po kliknięciu w słowo) ---------- */
 const HEB=/[\u0591-\u05BD\u05BF-\u05C2\u05C4\u05C5\u05C7\u05D0-\u05EA]+/g;
@@ -406,26 +330,26 @@ const PRE={ו:"i, a",ה:"rodzajnik „ten”",ב:"w, na, przy",ל:"do, dla",מ:"
 const D={};Object.entries({
 "אלהים":["Bóg, bogowie","אל (el) — „moc, bóstwo”","Ma kształt liczby mnogiej (-ים), ale gdy oznacza Boga Izraela, czasownik stoi przy nim w liczbie pojedynczej."],
 "יהוה":["Imię własne Boga (tetragram)","היה (hajah) — „być”","Z szacunku nie wymawia się go; czytelnik mówi „Adonaj” (Pan), stąd w polskich przekładach „Pan”. Samogłoski w tekście pochodzą od słowa Adonaj.","Adonaj"],
-"ברא":["stworzyć","ברא (bara)","W formie podstawowej (qal) podmiotem tego czasownika w Biblii jest zawsze Bóg."],
+"ברא":["stworzyć","ברא (bara) — „stworzyć”","W formie podstawowej (qal) podmiotem tego czasownika w Biblii jest zawsze Bóg."],
 "ראשית":["początek, pierwsze","ראש (rosz) — „głowa”","Hebrajska nazwa Księgi Rodzaju, Bereszit, to właśnie pierwsze słowo Biblii."],
-"שמים":["niebo, niebiosa","שמים (szamajim)","Końcówka -ajim to liczba podwójna; hebrajski nie ma pojedynczej formy „niebo”. Podobnie jest z wodą (majim)."],
-"ארץ":["ziemia, kraj","ארץ (erec)","Znaczy i całą ziemię, i „kraj”; Erec Israel to Ziemia Izraela."],
+"שמים":["niebo, niebiosa","שמים (szamajim) — „niebo”","Końcówka -ajim to liczba podwójna; hebrajski nie ma pojedynczej formy „niebo”. Podobnie jest z wodą (majim)."],
+"ארץ":["ziemia, kraj","ארץ (erec) — „ziemia”","Znaczy i całą ziemię, i „kraj”; Erec Israel to Ziemia Izraela."],
 "אדם":["człowiek","אדם / אדמה — „gleba”","W Rdz 2,7 jest gra słów: adam (człowiek) powstaje z adamah (gleby)."],
 "שלום":["pokój, pomyślność","שלם (szalem) — „być cały”","Używane jako powitanie i pożegnanie; oznacza pełnię dobrostanu, nie tylko brak wojny."],
-"רוח":["duch, wiatr, tchnienie","רוח (ruach)","To samo słowo znaczy wiatr, oddech i Ducha; jest rodzaju żeńskiego."],
-"נפש":["dusza, życie, istota żywa","נפש (nefesz)","Pierwotnie „gardło, oddech”; nie oznacza duszy oderwanej od ciała, lecz żywą istotę (Rdz 2,7)."],
-"חסד":["łaska, wierność, miłosierdzie","חסד (chesed)","Polskie przekłady oddają je różnie; chodzi o wierną miłość wynikającą z przymierza."],
-"דבר":["słowo, rzecz, sprawa","דבר (dawar)","Jedno słowo na „słowo” i „rzecz”: słowo jest czynem. Dekalog to po hebrajsku „dziesięć słów”."],
+"רוח":["duch, wiatr, tchnienie","רוח (ruach) — „duch, wiatr”","To samo słowo znaczy wiatr, oddech i Ducha; jest rodzaju żeńskiego."],
+"נפש":["dusza, życie, istota żywa","נפש (nefesz) — „oddech, życie”","Pierwotnie „gardło, oddech”; nie oznacza duszy oderwanej od ciała, lecz żywą istotę (Rdz 2,7)."],
+"חסד":["łaska, wierność, miłosierdzie","חסד (chesed) — „łaska, wierność”","Polskie przekłady oddają je różnie; chodzi o wierną miłość wynikającą z przymierza."],
+"דבר":["słowo, rzecz, sprawa","דבר (dawar) — „mówić, słowo”","Jedno słowo na „słowo” i „rzecz”: słowo jest czynem. Dekalog to po hebrajsku „dziesięć słów”."],
 "תורה":["pouczenie, Prawo","ירה (jara) — „wskazać kierunek”","Pierwotnie nie „prawo”, lecz „wskazówka, nauczanie”; to też hebrajska nazwa Pięcioksięgu."],
-"אור":["światło","אור (or)","Pierwsze słowa Boga w Biblii: „niech się stanie światło” (jehi or, Rdz 1,3)."],
-"אהב":["kochać","אהב (ahaw)","W Szema Izrael: „będziesz miłował Pana, Boga swego” (Pwt 6,5)."],
+"אור":["światło","אור (or) — „świecić”","Pierwsze słowa Boga w Biblii: „niech się stanie światło” (jehi or, Rdz 1,3)."],
+"אהב":["kochać","אהב (ahaw) — „kochać”","W Szema Izrael: „będziesz miłował Pana, Boga swego” (Pwt 6,5)."],
 "שבת":["odpocząć, ustać; szabat","שבת (szawat) — „przestać”","Szabat to dosłownie „ustanie” pracy (Rdz 2,2)."],
-"הבל":["tchnienie, marność; Abel","הבל (hewel)","Imię Abla to ten sam wyraz; w Koh „marność nad marnościami” to hawel hawalim."],
+"הבל":["tchnienie, marność; Abel","הבל (hewel) — „tchnienie”","Imię Abla to ten sam wyraz; w Koh „marność nad marnościami” to hawel hawalim."],
 "ישראל":["Izrael","שרה (sara) „walczyć” + אל (el) „Bóg”","Imię, które Jakub dostał po walce nad Jabbokiem (Rdz 32,29)."],
-"את":["(znak dopełnienia)","את (et)","Partykuła bez polskiego odpowiednika; stoi przed określonym dopełnieniem bliższym."],
-"אשר":["który, że, gdzie","אשר (aszer)","Jedno z najczęstszych słów Biblii; łączy zdania podrzędne, jak polskie „który”."],
-"כי":["że, ponieważ, gdy","כי (ki)","W Rdz 1 refren: „i widział Bóg, że (ki) to było dobre”."],
-"לא":["nie","לא (lo)","Przeczy czasownikom; zakaz w Dekalogu to lo + forma przyszła: „nie będziesz…”."]
+"את":["(znak dopełnienia)","","Partykuła bez polskiego odpowiednika; stoi przed określonym dopełnieniem bliższym."],
+"אשר":["który, że, gdzie","","Jedno z najczęstszych słów Biblii; łączy zdania podrzędne, jak polskie „który”."],
+"כי":["że, ponieważ, gdy","","W Rdz 1 refren: „i widział Bóg, że (ki) to było dobre”."],
+"לא":["nie","","Przeczy czasownikom; zakaz w Dekalogu to lo + forma przyszła: „nie będziesz…”."]
 }).forEach(([k,v])=>k.split(" ").forEach(x=>D[x]=v));
 
 let tipEl=null,tipTok=0;
@@ -449,6 +373,18 @@ async function toPl(en){
     if(+j.responseStatus===200&&t&&!/MYMEMORY|INVALID/i.test(t)&&t.toLowerCase()!==en.toLowerCase())return t}catch(e){}
   return"";
 }
+const BD="https://bolls.life/dictionary-definition/BDBT/";
+const bolls=q=>getJSON(BD+encodeURIComponent(q)+"/").then(a=>Array.isArray(a)?a:[]).catch(()=>[]);
+const liOne=h=>{const m=/<li>([^<]*)/.exec(h||"");return m?m[1].trim():""};
+const clean=t=>t.replace(/\([^)]*\)/g,"").replace(/^to\s+/,"").split(/[;,]/)[0].trim();
+/* rdzeń: z numeru Stronga idziemy do pola „Origin” i bierzemy hasło, od którego słowo pochodzi */
+async function rootOf(h){
+  const g=async q=>{const a=await bolls(q);return a.find(x=>x.topic===q)||a[0]};
+  const e=await g(h);if(!e)return null;
+  const m=/Origin:\s*(?:from|the same as)\s*<a href=S:(H\d+)>/.exec(e.definition||"");
+  const t=(m&&await g(m[1]))||e,en=clean(liOne(t.definition))||clean(t.short_definition||"");
+  return{lex:cons(t.lexeme||""),pl:en?await toPl(en):""};
+}
 async function lookup(k){
   if(dict.has(k))return dict.get(k);
   const cs=[[k,""]];for(let i=0,p="";i<2&&k.length-i>2&&PRE[k[i]];i++){p+=k[i];cs.push([k.slice(i+1),p])}
@@ -460,32 +396,86 @@ async function lookup(k){
       if(!Array.isArray(a)||!a.length)continue;
       const e=a.find(x=>/BDB/.test(x.parent_lexicon))||a[0],defs=[];
       (function f(ss){(ss||[]).forEach(x=>{if(x.definition)defs.push(x.definition);f(x.senses)})})(e.content&&e.content.senses);
-      const en=strip(defs[0]||"").replace(/\([^)]*\)/g,"").split(/[;:.]/)[0].split(",").slice(0,3).join(",").trim().slice(0,80);
-      const lem=cons(e.headword||"");
-      r={en,pl:en?await toPl(en):"",root:lem.length>1?lem.split("").join("־")+" (hasło słownika)":"",pre:p,strong:e.strong_number,src:"Sefaria (BDB / Klein), tłumaczenie na polski: MyMemory (automatyczne)"};
+      const en=clean(strip(defs[0]||"")).slice(0,80);
+      let st=e.strong_number?"H"+String(e.strong_number).replace(/\D/g,""):"";
+      if(!st){const b=await bolls(w);if(b[0])st=b[0].topic}
+      r={en,pl:en?await toPl(en):"",pre:p,strong:st,lem:cons(e.headword||""),src:"Sefaria (BDB / Klein), Bolls; tłumaczenie na polski: MyMemory (automatyczne)"};
       break;
     }}catch(e){}
+    if(r){
+      let ro=null;try{ro=r.strong?await rootOf(r.strong):null}catch(e){}
+      const lex=(ro&&ro.lex)||r.lem||"";
+      r.root=lex.length>1?lex.split("").join("־")+(ro&&ro.pl?` — „${ro.pl}”`:""):"";
+    }
   }
   r=r||{};
-  if(!r.fact){
-    r.fact=r.pre?`Przedrostek ${r.pre.split("").map(c=>c+" ("+PRE[c]+")").join(" + ")}: w hebrajskim spójniki, przyimki i rodzajnik dokleja się do słowa.`
-      :r.strong?`W słowniku Stronga to hasło H${r.strong}.`
-      :"Większość hebrajskich słów da się sprowadzić do trzyliterowego rdzenia; zmieniają się samogłoski i przedrostki.";
-  }
+  if(!r.fact&&r.pre)r.fact=`Przedrostek ${r.pre.split("").map(c=>c+" ("+PRE[c]+")").join(" + ")}: w hebrajskim spójniki, przyimki i rodzajnik dokleja się do słowa.`;
   dict.set(k,r);return r;
 }
-function paint(raw,r){
+/* tłumaczenie w kontekście: polski werset z Bolls (Biblia Gdańska), słowo dopasowane po rdzeniu lub numerze Stronga */
+let plSlug=null;const PLB={};
+async function plTrans(){
+  if(plSlug)return plSlug;
+  try{const j=await getJSON("https://bolls.life/static/bolls/app/views/languages.json");
+    const g=j.find(x=>/pol/i.test(x.language)),l=(g&&g.translations)||[];
+    plSlug=["UBG","BG"].find(x=>l.some(t=>t.short_name===x))||(l[0]&&l[0].short_name)||"UBG";
+  }catch(e){plSlug="UBG"}
+  return plSlug;
+}
+async function plVerse(bi,c,n){
+  const sl=await plTrans(),k=sl+bi+":"+c;
+  if(!PLB[k])PLB[k]=getJSON(`https://bolls.life/get-text/${sl}/${bi+1}/${c}/`).catch(e=>{delete PLB[k];throw e});
+  const x=(await PLB[k]).find(y=>+y.verse===n);return x?{raw:x.text,slug:sl}:null;
+}
+function plTokens(raw){
+  const out=[],t=raw.replace(/<(?!\/?S>)[^>]*>/gi,"").replace(/&nbsp;/g," ").replace(/&quot;/g,'"').replace(/&amp;/g,"&");
+  t.split(/(<S>\d+<\/S>)/i).forEach(p=>{
+    const m=/^<S>(\d+)<\/S>$/i.exec(p);
+    if(m){for(let i=out.length-1;i>=0;i--)if(out[i].t.trim()){(out[i].s=out[i].s||[]).push(m[1]);break}return}
+    p.split(/(\s+)/).forEach(x=>{if(x)out.push({t:x})});
+  });
+  return out;
+}
+const fold=s=>s.toLowerCase().replace(/ł/g,"l").normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+function matchIdx(tk,strong,pl,hi,n){
+  const num=strong.replace(/\D/g,""),by=num?tk.map((x,i)=>x.s&&x.s.includes(num)?i:-1).filter(i=>i>=0):[];
+  if(by.length)return by;
+  const st=fold(pl||"").split(/[^a-z]+/).filter(w=>w.length>=3).map(w=>w.slice(0,Math.max(Math.min(4,w.length),w.length-2)));
+  let rk=-1;const W=[];
+  tk.forEach((x,i)=>{if(!x.t.trim())return;rk++;const f=fold(x.t).replace(/[^a-z]/g,"");if(st.some(q=>f.startsWith(q)))W.push({i,rk})});
+  if(!W.length)return[];
+  const tot=Math.max(rk,1),pos=n>1?hi/(n-1):0;
+  W.sort((a,b)=>Math.abs(a.rk/tot-pos)-Math.abs(b.rk/tot-pos));
+  return[W[0].i];
+}
+async function context(el,r){
+  const v=el.closest(".v");if(!v)return null;
+  const bi=+v.dataset.b,c=+v.dataset.c,n=+v.dataset.v,ws=[...v.querySelectorAll(".w")];
+  const pv=await plVerse(bi,c,n);if(!pv)return null;
+  const tk=plTokens(pv.raw);
+  return{tk,idx:matchIdx(tk,r.strong||"",r.pl,ws.indexOf(el),ws.length),ref:`${B[bi].a} ${c},${n}`,slug:pv.slug};
+}
+function ctxHTML(x){
+  const{tk,idx}=x,a=idx.length?Math.min(...idx):0,b=idx.length?Math.max(...idx)+1:0,j=(s,e)=>esc(tk.slice(s,e).map(t=>t.t).join(""));
+  return idx.length?`<span class="g">${j(0,a)}</span><mark>${j(a,b)}</mark><span class="g">${j(b)}</span>`:`<span class="g">${j(0)}</span>`;
+}
+function paint(raw,r,ctx){
   const he=noTeam(raw);
   $("tb").innerHTML=`<div class="he" lang="he">${esc(he)}</div><div class="pr">[ ${esc((r&&r.pron)||tr(raw))} ]</div>`+(!r?'<p class="en">Szukam w słowniku…</p>':
-    `<div class="pl">${esc(r.pl||r.en||"brak hasła w słowniku")}</div>${r.pl&&r.en?`<div class="en">ang.: ${esc(r.en)}</div>`:""}<dl>${r.root?`<dt>Rdzeń</dt><dd>${esc(r.root)}</dd>`:""}${r.pre&&r.src==="słowniczek podręczny"?`<dt>Przedrostek</dt><dd>${esc(r.pre)}</dd>`:""}<dt>Ciekawostka</dt><dd class="fun">${esc(r.fact)}</dd></dl>${r.src?`<div class="src">Źródło: ${esc(r.src)}</div>`:""}`);
+    `<div class="pl">${esc(r.pl||r.en||"brak hasła w słowniku")}</div>${r.pl&&r.en?`<div class="en">ang.: ${esc(r.en)}</div>`:""}<dl>`+
+    (ctx===undefined?'<dt>W kontekście</dt><dd class="en">Wczytuję werset…</dd>':ctx?`<dt>W kontekście</dt><dd class="ctx">${ctxHTML(ctx)}<small>${esc(ctx.ref+" · "+ctx.slug)}</small></dd>`:"")+
+    (r.root?`<dt>Rdzeń</dt><dd>${esc(r.root)}</dd>`:"")+(r.pre&&r.src==="słowniczek podręczny"?`<dt>Przedrostek</dt><dd>${esc(r.pre)}</dd>`:"")+
+    (r.fact?`<dt>Ciekawostka</dt><dd class="fun">${esc(r.fact)}</dd>`:"")+`</dl>${r.src?`<div class="src">Źródło: ${esc(r.src)}</div>`:""}`);
   tip.hidden=false;place();
 }
 async function showTip(el){
   const same=tipEl===el&&!tip.hidden;hideTip();if(same)return;
   const tok=++tipTok,raw=el.textContent;tipEl=el;el.classList.add("act");
   paint(raw,null);
-  const r=await lookup(cons(raw));
-  if(tok===tipTok)paint(raw,r);
+  const r=await lookup(cons(raw));if(tok!==tipTok)return;
+  paint(raw,r,undefined);
+  let x=null;try{x=await context(el,r)}catch(e){}
+  if(tok===tipTok)paint(raw,r,x);
 }
 document.addEventListener("keydown",e=>{if(e.key==="Escape")hideTip()});
 addEventListener("resize",()=>hideTip());
